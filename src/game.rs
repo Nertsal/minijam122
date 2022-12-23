@@ -57,7 +57,7 @@ impl geng::State for Game {
         self.handle_event(event)
     }
 
-    fn update(&mut self, delta_time: f64) {
+    fn fixed_update(&mut self, delta_time: f64) {
         let delta_time = Time::new(delta_time as f32);
         self.update(delta_time)
     }
