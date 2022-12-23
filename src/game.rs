@@ -42,6 +42,7 @@ impl Game {
                 velocity: Vec3::ZERO,
                 radius: Coord::new(0.1),
                 color: Rgba::RED,
+                last_shot: Vec3::ZERO,
             },
             control: Control::Disabled,
         }

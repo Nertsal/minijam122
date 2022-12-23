@@ -15,6 +15,12 @@ impl Game {
         self.player.velocity += GRAVITY.map(Coord::new) * delta_time;
         self.player.position += self.player.velocity * delta_time;
 
+        // Player-Water collisions
+        let player = &mut self.player;
+        if player.position.z - player.radius < Coord::new(-0.25) {
+            self.player_death();
+        }
+
         // Player-Level collisions
         let player = &mut self.player;
         let level = &self.assets.level;
@@ -58,5 +64,10 @@ impl Game {
                 *time += delta_time;
             }
         }
+    }
+
+    pub fn player_death(&mut self) {
+        self.player.position = self.player.last_shot;
+        self.player.velocity = Vec3::ZERO;
     }
 }

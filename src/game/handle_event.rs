@@ -62,9 +62,10 @@ impl Game {
                 };
             }
             Control::Power { direction, time } => {
-                let power = Coord::new((1.0 - time.as_f32().cos()) * 2.5);
+                let power = Coord::new((1.0 - time.as_f32().cos()) * 7.0);
                 self.player.velocity += (direction * power).extend(Coord::ZERO);
                 self.control = Control::Disabled;
+                self.player.last_shot = self.player.position;
             }
         }
     }
@@ -88,6 +89,6 @@ impl Game {
 
     pub fn screen_pos_to_move_dir(&self, position: Vec2<f64>) -> Option<Vec2<Coord>> {
         self.raycast_to_mouse(position)
-            .map(|pos| (pos - self.player.position).xy())
+            .map(|pos| (pos - self.player.position).xy().normalize_or_zero())
     }
 }
