@@ -9,6 +9,7 @@ type Time = R32;
 pub struct Game {
     geng: Geng,
     assets: Rc<Assets>,
+    framebuffer_size: Vec2<usize>,
     camera: Camera,
     controlling_camera: bool,
     player: Player,
@@ -19,6 +20,7 @@ impl Game {
         Self {
             geng: geng.clone(),
             assets: assets.clone(),
+            framebuffer_size: vec2(1, 1),
             camera: Camera {
                 fov: f32::PI / 3.0,
                 pos: vec3(0.0, 0.0, 1.0),

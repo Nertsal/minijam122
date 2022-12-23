@@ -2,8 +2,9 @@ use super::*;
 
 impl Game {
     pub fn draw(&mut self, framebuffer: &mut ugli::Framebuffer) {
-        ugli::clear(framebuffer, Some(Rgba::BLACK), Some(1.0), None);
+        self.framebuffer_size = framebuffer.size();
         let framebuffer_size = framebuffer.size().map(|x| x as f32);
+        ugli::clear(framebuffer, Some(Rgba::BLACK), Some(1.0), None);
 
         // Level
         for mesh in &self.assets.level {

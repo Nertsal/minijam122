@@ -18,9 +18,10 @@ impl Game {
             )
             .map(Coord::new);
             let len = v.len();
+            let bounciness = 0.5;
             if len < player.radius {
                 let n = v.normalize_or_zero();
-                player.velocity -= n * Vec3::dot(n, player.velocity);
+                player.velocity -= n * Vec3::dot(n, player.velocity) * Coord::new(1.0 + bounciness);
                 player.position += n * (player.radius - len);
             }
         }
