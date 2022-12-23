@@ -5,6 +5,7 @@ pub struct Vertex {
     pub a_uv: Vec2<f32>,
     pub a_mr_uv: Vec2<f32>,
     pub a_pos: Vec3<f32>,
+    pub a_outline_normal: Vec3<f32>,
     pub a_normal: Vec3<f32>,
     pub a_color: Rgba<f32>,
 }
@@ -70,18 +71,26 @@ pub async fn load_meshes(
                 .into_u32()
                 .map(|x| x as usize);
             assert_eq!(primitive.mode(), gltf::mesh::Mode::Triangles);
-            let data = ugli::VertexBuffer::new_static(
+            let mut data = ugli::VertexBuffer::new_static(
                 geng.ugli(),
                 indices
                     .map(|index| Vertex {
                         a_mr_uv: Vec2::ZERO, // TODO
                         a_uv: Vec2::ZERO,    // TODO
                         a_pos: positions[index],
-                        a_normal: normals[index], // TODO: optional
+                        a_outline_normal: normals[index], // TODO: optional
+                        a_normal: Vec3::ZERO,
                         a_color: colors.as_ref().map_or(Rgba::WHITE, |colors| colors[index]),
                     })
                     .collect(),
             );
+            for tri in data.chunks_mut(3) {
+                let n = Vec3::cross(tri[1].a_pos - tri[0].a_pos, tri[2].a_pos - tri[0].a_pos)
+                    .normalize_or_zero();
+                for v in tri {
+                    v.a_normal = n;
+                }
+            }
             let material = {
                 let material = primitive.material();
                 let white_texture =

@@ -63,7 +63,25 @@ impl Game {
                     depth_func: Some(ugli::DepthFunc::Less),
                     ..default()
                 },
-            )
+            );
+            ugli::draw(
+                framebuffer,
+                &self.assets.shaders.gltf_outline,
+                ugli::DrawMode::Triangles,
+                &mesh.data,
+                (
+                    ugli::uniforms! {
+                        u_model_matrix: matrix.map(|x| x.as_f32()),
+                    },
+                    geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
+                ),
+                ugli::DrawParameters {
+                    depth_func: Some(ugli::DepthFunc::Less),
+                    cull_face: Some(ugli::CullFace::Front),
+                    blend_mode: Some(ugli::BlendMode::default()),
+                    ..default()
+                },
+            );
         }
     }
 }
