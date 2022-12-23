@@ -41,7 +41,7 @@ impl Game {
         match self.control {
             Control::Disabled => return,
             Control::Direction => {
-                let direction = self.screen_pos_to_move_dir(self.geng.window().mouse_pos());
+                let direction = self.screen_pos_to_move_dir(position);
                 self.control = Control::Power {
                     direction,
                     time: Time::ZERO,
@@ -69,7 +69,9 @@ impl Game {
             0.0,
             ray,
         );
-        cast.map(|cast| (ray.dir * cast).xy().map(Coord::new) - self.player.position.xy())
-            .unwrap_or(Vec2::ZERO)
+        cast.map(|cast| {
+            (ray.from + ray.dir * cast).xy().map(Coord::new) - self.player.position.xy()
+        })
+        .unwrap_or(Vec2::ZERO)
     }
 }
