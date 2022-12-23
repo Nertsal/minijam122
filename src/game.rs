@@ -4,6 +4,7 @@ pub struct Game {
     geng: Geng,
     assets: Rc<Assets>,
     camera: Camera,
+    controlling_camera: bool,
 }
 
 impl Game {
@@ -18,6 +19,7 @@ impl Game {
                 rot_h: 0.0,
                 rot_v: f32::PI / 3.0,
             },
+            controlling_camera: false,
         }
     }
 }
@@ -49,6 +51,32 @@ impl geng::State for Game {
                     ..default()
                 },
             );
+        }
+    }
+
+    fn handle_event(&mut self, event: geng::Event) {
+        match event {
+            geng::Event::MouseDown {
+                button: geng::MouseButton::Right,
+                ..
+            } => {
+                self.geng.window().lock_cursor();
+                self.controlling_camera = true;
+            }
+            geng::Event::MouseUp {
+                button: geng::MouseButton::Right,
+                ..
+            } => {
+                self.geng.window().unlock_cursor();
+                self.controlling_camera = false;
+            }
+            geng::Event::MouseMove { delta, .. } if self.controlling_camera => {
+                let sensitivity = 0.01;
+                self.camera.rot_h += -delta.x as f32 * sensitivity;
+                self.camera.rot_v =
+                    (self.camera.rot_v + delta.y as f32 * sensitivity).clamp(0.0, f32::PI);
+            }
+            _ => {}
         }
     }
 }
