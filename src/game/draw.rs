@@ -55,7 +55,7 @@ impl Game {
                         u_light_dir: vec3(1.0, -2.0, 5.0),
                         u_light_color: Rgba::WHITE,
                         u_ambient_light_color: Rgba::WHITE,
-                        u_ambient_light_intensity: 0.2,
+                        u_ambient_light_intensity: 0.8,
                     },
                     geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
                 ),

@@ -29,6 +29,11 @@ impl Game {
                 self.camera.rot_v =
                     (self.camera.rot_v + delta.y as f32 * sensitivity).clamp(0.0, f32::PI);
             }
+            geng::Event::Wheel { delta } => {
+                let sensitivity = 0.01;
+                self.camera.distance =
+                    (self.camera.distance - delta as f32 * sensitivity).clamp(1.0, 7.5);
+            }
             geng::Event::KeyDown { key: geng::Key::R } => {
                 self.player.position = Vec3::ZERO;
                 self.player.velocity = Vec3::ZERO;
