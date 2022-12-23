@@ -3,19 +3,23 @@ use super::*;
 impl Game {
     pub fn handle_event(&mut self, event: geng::Event) {
         match event {
-            geng::Event::MouseDown {
-                button: geng::MouseButton::Right,
-                ..
-            } => {
-                self.geng.window().lock_cursor();
-                self.controlling_camera = true;
-            }
-            geng::Event::MouseDown {
-                position,
-                button: geng::MouseButton::Left,
-            } if !self.controlling_camera => {
-                self.click(position);
-            }
+            geng::Event::MouseDown { button, position } => match button {
+                geng::MouseButton::Left => {
+                    if !self.controlling_camera {
+                        self.click(position);
+                    }
+                }
+                geng::MouseButton::Middle => {
+                    if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
+                        self.player.position = pos + Vec2::ZERO.extend(self.player.radius);
+                        self.player.velocity = Vec3::ZERO;
+                    }
+                }
+                geng::MouseButton::Right => {
+                    self.geng.window().lock_cursor();
+                    self.controlling_camera = true;
+                }
+            },
             geng::Event::MouseUp {
                 button: geng::MouseButton::Right,
                 ..
