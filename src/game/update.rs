@@ -1,12 +1,17 @@
 use super::*;
 
 const GRAVITY: Vec3<f32> = vec3(0.0, 0.0, -9.8);
-const DRAG: f32 = 0.2;
+const DRAG: f32 = 1.0;
 
 impl Game {
     pub fn update(&mut self, delta_time: Time) {
         // Movement
-        self.player.velocity *= Coord::ONE - Coord::new(DRAG) * delta_time;
+        self.player.velocity *= Coord::ONE
+            - Coord::new(if self.player.velocity.len() > Coord::ONE {
+                DRAG
+            } else {
+                2.0
+            }) * delta_time;
         self.player.velocity += GRAVITY.map(Coord::new) * delta_time;
         self.player.position += self.player.velocity * delta_time;
 
