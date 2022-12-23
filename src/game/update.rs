@@ -38,7 +38,11 @@ impl Game {
             .min_by_key(|v| v.len())
         {
             let len = v.len();
-            let bounciness = if v.len().raw() > 0.1 { 0.5 } else { 0.0 };
+            let bounciness = if player.velocity.len().raw() > 0.1 {
+                0.5
+            } else {
+                0.0
+            };
             if len < player.radius {
                 let n = v.normalize_or_zero();
                 player.velocity -= n * Vec3::dot(n, player.velocity) * Coord::new(1.0 + bounciness);
