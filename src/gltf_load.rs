@@ -42,7 +42,7 @@ pub async fn load_meshes(
     path: impl AsRef<std::path::Path>,
 ) -> anyhow::Result<Vec<Mesh>> {
     let file = load_file(path.as_ref()).await?;
-    let (document, buffers, images) = gltf::import_slice(&file).unwrap();
+    let (document, buffers, _images) = gltf::import_slice(file).unwrap();
     let mut meshes = Vec::new();
     for mesh in document.meshes() {
         info!("{:?}", mesh.name());

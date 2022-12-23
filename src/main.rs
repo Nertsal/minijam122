@@ -21,7 +21,7 @@ fn main() {
                 std::env::current_exe()
                     .unwrap()
                     .parent()
-                    .unwrap_or(".".as_ref())
+                    .unwrap_or_else(|| ".".as_ref())
                     .join("panic.txt"),
             )
             .unwrap();
