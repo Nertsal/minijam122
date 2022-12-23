@@ -41,7 +41,7 @@ impl Game {
         }
 
         // Camera interpolation
-        let interpolation = 0.5;
+        let interpolation = 1.0 / 0.5;
         let target_pos = self.player.position.map(Coord::as_f32) + vec3(0.0, 0.0, 1.0);
         let pos = self.camera.pos;
         self.camera.pos += (target_pos - pos) * interpolation * delta_time.as_f32();

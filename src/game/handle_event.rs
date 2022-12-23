@@ -34,19 +34,28 @@ impl Game {
                 self.camera.distance =
                     (self.camera.distance - delta as f32 * sensitivity).clamp(1.0, 7.5);
             }
-            geng::Event::KeyDown { key: geng::Key::R } => {
-                self.player.position = Vec3::ZERO;
-                self.player.velocity = Vec3::ZERO;
-            }
+            geng::Event::KeyDown { key } => match key {
+                geng::Key::R => {
+                    self.player.position = Vec3::ZERO;
+                    self.player.velocity = Vec3::ZERO;
+                }
+                geng::Key::T => {
+                    if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
+                        self.player.position = pos + Vec2::ZERO.extend(self.player.radius);
+                        self.player.velocity = Vec3::ZERO;
+                    }
+                }
+                _ => {}
+            },
             _ => {}
         }
     }
 
     fn click(&mut self, position: Vec2<f64>) {
         match self.control {
-            Control::Disabled => return,
+            Control::Disabled => {}
             Control::Direction => {
-                let direction = self.screen_pos_to_move_dir(position);
+                let direction = self.screen_pos_to_move_dir(position).unwrap_or(Vec2::ZERO);
                 self.control = Control::Power {
                     direction,
                     time: Time::ZERO,
@@ -60,7 +69,7 @@ impl Game {
         }
     }
 
-    pub fn screen_pos_to_move_dir(&self, position: Vec2<f64>) -> Vec2<Coord> {
+    pub fn raycast_to_mouse(&self, position: Vec2<f64>) -> Option<Vec3<Coord>> {
         let ray = self.camera.pixel_ray(
             self.framebuffer_size.map(|x| x as f32),
             position.map(|x| x as f32),
@@ -74,9 +83,11 @@ impl Game {
             0.0,
             ray,
         );
-        cast.map(|cast| {
-            (ray.from + ray.dir * cast).xy().map(Coord::new) - self.player.position.xy()
-        })
-        .unwrap_or(Vec2::ZERO)
+        cast.map(|cast| (ray.from + ray.dir * cast).map(Coord::new))
+    }
+
+    pub fn screen_pos_to_move_dir(&self, position: Vec2<f64>) -> Option<Vec2<Coord>> {
+        self.raycast_to_mouse(position)
+            .map(|pos| (pos - self.player.position).xy())
     }
 }
