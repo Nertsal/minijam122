@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 geng = { git = "https://github.com/kuviman/geng" }
+gltf = "1.0.0"
