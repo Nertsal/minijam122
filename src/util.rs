@@ -47,6 +47,14 @@ pub fn intersect_ray_with_closest(
         .min_by_key(|&x| r32(x))
 }
 
+pub fn intersect_ray_with_plane(
+    plane_normal: Vec3<f32>,
+    plane_d: f32,
+    ray: geng::CameraRay,
+) -> f32 {
+    -(Vec3::dot(ray.from, plane_normal) + plane_d) / Vec3::dot(ray.dir, plane_normal)
+}
+
 pub fn vector_from_triangle(tri: [Vec3<f32>; 3], p: Vec3<f32>) -> Vec3<f32> {
     let mut options = vec![]; // TODO: optimize
     for v in tri {

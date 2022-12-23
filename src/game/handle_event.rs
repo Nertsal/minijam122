@@ -59,7 +59,7 @@ impl Game {
         match self.control {
             Control::Disabled => {}
             Control::Direction => {
-                let direction = self.screen_pos_to_move_dir(position).unwrap_or(Vec2::ZERO);
+                let direction = self.screen_pos_to_move_dir(position);
                 self.control = Control::Power {
                     direction,
                     time: Time::ZERO,
@@ -91,8 +91,17 @@ impl Game {
         cast.map(|cast| (ray.from + ray.dir * cast).map(Coord::new))
     }
 
-    pub fn screen_pos_to_move_dir(&self, position: Vec2<f64>) -> Option<Vec2<Coord>> {
-        self.raycast_to_mouse(position)
-            .map(|pos| (pos - self.player.position).xy().normalize_or_zero())
+    pub fn screen_pos_to_move_dir(&self, position: Vec2<f64>) -> Vec2<Coord> {
+        let ray = self.camera.pixel_ray(
+            self.framebuffer_size.map(|x| x as f32),
+            position.map(|x| x as f32),
+        );
+        let t = util::intersect_ray_with_plane(
+            vec3(0.0, 0.0, 1.0),
+            -self.player.position.z.as_f32(),
+            ray,
+        );
+        let raycast = (ray.from + ray.dir * t).map(Coord::new);
+        (raycast.xy() - self.player.position.xy()).normalize_or_zero()
     }
 }

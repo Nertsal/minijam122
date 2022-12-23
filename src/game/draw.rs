@@ -17,9 +17,7 @@ impl Game {
         match &self.control {
             Control::Disabled => {}
             Control::Direction => {
-                let direction = self
-                    .screen_pos_to_move_dir(self.geng.window().mouse_pos())
-                    .unwrap_or(Vec2::ZERO);
+                let direction = self.screen_pos_to_move_dir(self.geng.window().mouse_pos());
                 let angle = direction.arg();
                 let matrix = Mat4::translate(self.player.position)
                     * Mat4::rotate_z(angle)
