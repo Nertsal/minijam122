@@ -2,6 +2,7 @@ use geng::prelude::*;
 
 mod assets;
 mod game;
+mod gltf;
 mod loading_screen;
 
 use assets::*;
@@ -39,7 +40,7 @@ fn main() {
     // geng.set_icon(&static_path().join("assets").join("icon.png"))
     //     .unwrap();
 
-    geng.audio().set_volume(0.0);
+    // geng.audio().set_volume(0.0);
 
     geng::run(
         &geng,
