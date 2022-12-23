@@ -44,6 +44,7 @@ impl Game {
         framebuffer: &'a mut ugli::Framebuffer,
     ) {
         for mesh in gltf.into_iter() {
+            let matrix = matrix.map(|x| x.as_f32()); // * mesh.transform;
             ugli::draw(
                 framebuffer,
                 &self.assets.shaders.gltf,
@@ -52,7 +53,7 @@ impl Game {
                 (
                     mesh.material.uniforms(),
                     ugli::uniforms! {
-                        u_model_matrix: matrix.map(|x| x.as_f32()),
+                        u_model_matrix: matrix,
                         u_eye_pos: self.camera.eye_pos(),
                         u_light_dir: vec3(1.0, -2.0, 5.0),
                         u_light_color: Rgba::WHITE,
@@ -73,7 +74,7 @@ impl Game {
                 &mesh.data,
                 (
                     ugli::uniforms! {
-                        u_model_matrix: matrix.map(|x| x.as_f32()),
+                        u_model_matrix: matrix,
                     },
                     geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
                 ),
