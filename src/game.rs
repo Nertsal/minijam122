@@ -13,6 +13,13 @@ pub struct Game {
     camera: Camera,
     controlling_camera: bool,
     player: Player,
+    control: Control,
+}
+
+enum Control {
+    Disabled,
+    Direction { time: Time },
+    Power { direction: Vec2<Coord>, time: Time },
 }
 
 impl Game {
@@ -36,6 +43,7 @@ impl Game {
                 radius: Coord::new(0.1),
                 color: Rgba::RED,
             },
+            control: Control::Disabled,
         }
     }
 }

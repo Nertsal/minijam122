@@ -38,8 +38,21 @@ impl Game {
     }
 
     fn click(&mut self, position: Vec2<f64>) {
-        let position = position.map(|x| x as f32);
-        let dir = position - self.framebuffer_size.map(|x| x as f32 / 2.0);
-        self.player.velocity += (dir.normalize_or_zero() * 5.0).extend(0.0).map(Coord::new);
+        match self.control {
+            Control::Disabled => return,
+            Control::Direction { time } => {
+                let (sin, cos) = time.sin_cos();
+                let direction = vec2(cos, sin);
+                self.control = Control::Power {
+                    direction,
+                    time: Time::ZERO,
+                };
+            }
+            Control::Power { direction, time } => {
+                let power = Coord::new((1.0 - time.as_f32().cos()) * 2.5);
+                self.player.velocity += (direction * power).extend(Coord::ZERO);
+                self.control = Control::Disabled;
+            }
+        }
     }
 }

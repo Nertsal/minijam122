@@ -1,10 +1,12 @@
 use super::*;
 
 const GRAVITY: Vec3<f32> = vec3(0.0, 0.0, -9.8);
+const DRAG: f32 = 0.2;
 
 impl Game {
     pub fn update(&mut self, delta_time: Time) {
         // Movement
+        self.player.velocity *= Coord::ONE - Coord::new(DRAG) * delta_time;
         self.player.velocity += GRAVITY.map(Coord::new) * delta_time;
         self.player.position += self.player.velocity * delta_time;
 
@@ -23,6 +25,18 @@ impl Game {
                 let n = v.normalize_or_zero();
                 player.velocity -= n * Vec3::dot(n, player.velocity) * Coord::new(1.0 + bounciness);
                 player.position += n * (player.radius - len);
+            }
+        }
+
+        // Update control
+        match &mut self.control {
+            Control::Disabled => {
+                if player.velocity.len().as_f32() < 0.01 {
+                    self.control = Control::Direction { time: Time::ZERO };
+                }
+            }
+            Control::Direction { time } | Control::Power { time, .. } => {
+                *time += delta_time;
             }
         }
     }
