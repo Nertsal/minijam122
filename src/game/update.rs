@@ -18,12 +18,18 @@ impl Game {
         // Player-Level collisions
         let player = &mut self.player;
         let level = &self.assets.level;
-        for tri in level.iter().flat_map(|mesh| mesh.data.chunks(3)) {
-            let v = util::vector_from_triangle(
-                [tri[0].a_pos, tri[1].a_pos, tri[2].a_pos].map(|pos| (pos.extend(1.0)).xyz()),
-                player.position.map(Coord::as_f32),
-            )
-            .map(Coord::new);
+        if let Some(v) = level
+            .iter()
+            .flat_map(|mesh| mesh.data.chunks(3))
+            .map(|tri| {
+                util::vector_from_triangle(
+                    [tri[0].a_pos, tri[1].a_pos, tri[2].a_pos].map(|pos| (pos.extend(1.0)).xyz()),
+                    player.position.map(Coord::as_f32),
+                )
+                .map(Coord::new)
+            })
+            .min_by_key(|v| v.len())
+        {
             let len = v.len();
             let bounciness = 0.5;
             if len < player.radius {
