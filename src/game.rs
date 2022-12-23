@@ -20,6 +20,7 @@ enum Control {
     Disabled,
     Direction,
     Power { direction: Vec2<Coord>, time: Time },
+    Hitting { time: Time, hit: Vec3<Coord> },
 }
 
 impl Game {

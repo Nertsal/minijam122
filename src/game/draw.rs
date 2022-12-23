@@ -23,6 +23,12 @@ impl Game {
                     * Mat4::rotate_z(angle)
                     * Mat4::scale_uniform(Coord::new(0.2));
                 self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
+                let matrix = Mat4::translate(
+                    self.player.position
+                        - direction.extend(Coord::ZERO) * (self.player.radius + Coord::new(0.2)),
+                ) * Mat4::rotate_z(angle)
+                    * Mat4::scale_uniform(Coord::new(0.2));
+                self.draw_gltf(&self.assets.club, matrix, framebuffer);
             }
             Control::Power { direction, time } => {
                 let angle = direction.arg();
@@ -31,6 +37,29 @@ impl Game {
                     * Mat4::rotate_z(angle)
                     * Mat4::scale(vec3(0.2 + power.as_f32() * 0.1, 0.2, 0.2).map(Coord::new));
                 self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
+                let matrix = Mat4::translate(
+                    self.player.position
+                        - direction.extend(Coord::ZERO)
+                            * (self.player.radius + Coord::new(0.2 + power.as_f32() * 0.2)),
+                ) * Mat4::rotate_z(angle)
+                    * Mat4::scale_uniform(Coord::new(0.2));
+                self.draw_gltf(&self.assets.club, matrix, framebuffer);
+            }
+            Control::Hitting { time, hit } => {
+                let direction = hit.xy().normalize_or_zero();
+                let angle = direction.arg();
+                let power = hit.len() * Coord::new(2.5 / 7.0);
+                let far = Coord::new(0.2 + power.as_f32() * 0.2);
+                let b = 2.0;
+                let t = time.as_f32();
+                let t = -(t - 1.0) * (b * t + 1.0);
+                let matrix = Mat4::translate(
+                    self.player.position
+                        - direction.extend(Coord::ZERO)
+                            * (self.player.radius + far * Coord::new(t)),
+                ) * Mat4::rotate_z(angle)
+                    * Mat4::scale_uniform(Coord::new(0.2));
+                self.draw_gltf(&self.assets.club, matrix, framebuffer);
             }
         }
     }

@@ -57,7 +57,7 @@ impl Game {
 
     fn click(&mut self, position: Vec2<f64>) {
         match self.control {
-            Control::Disabled => {}
+            Control::Disabled | Control::Hitting { .. } => {}
             Control::Direction => {
                 let direction = self.screen_pos_to_move_dir(position);
                 self.control = Control::Power {
@@ -67,9 +67,10 @@ impl Game {
             }
             Control::Power { direction, time } => {
                 let power = Coord::new((1.0 - time.as_f32().cos()) * 7.0);
-                self.player.velocity += (direction * power).extend(Coord::ZERO);
-                self.control = Control::Disabled;
-                self.player.last_shot = self.player.position;
+                self.control = Control::Hitting {
+                    time: Time::ZERO,
+                    hit: (direction * power).extend(Coord::ZERO),
+                };
             }
         }
     }
@@ -102,6 +103,6 @@ impl Game {
             ray,
         );
         let raycast = (ray.from + ray.dir * t).map(Coord::new);
-        (raycast.xy() - self.player.position.xy()).normalize_or_zero()
+        -(raycast.xy() - self.player.position.xy()).normalize_or_zero()
     }
 }

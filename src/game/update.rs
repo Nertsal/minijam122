@@ -17,7 +17,7 @@ impl Game {
 
         // Player-Water collisions
         let player = &mut self.player;
-        if player.position.z - player.radius < Coord::new(-0.25) {
+        if player.position.z - player.radius < Coord::new(-1.1) {
             self.player_death();
         }
 
@@ -66,6 +66,14 @@ impl Game {
             Control::Direction => {}
             Control::Power { time, .. } => {
                 *time += delta_time;
+            }
+            Control::Hitting { time, hit } => {
+                *time += delta_time / Time::new(0.3);
+                if *time >= Time::ONE {
+                    self.player.velocity += *hit;
+                    self.player.last_shot = self.player.position;
+                    self.control = Control::Disabled;
+                }
             }
         }
     }

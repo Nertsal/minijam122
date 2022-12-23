@@ -8,6 +8,8 @@ pub struct Assets {
     pub player: Vec<Mesh>,
     #[asset(load_with = "gltf_load::load_meshes(&geng, base_path.join(\"arrow.glb\"))")]
     pub arrow: Vec<Mesh>,
+    #[asset(load_with = "gltf_load::load_meshes(&geng, base_path.join(\"club.glb\"))")]
+    pub club: Vec<Mesh>,
     pub shaders: Shaders,
 }
 
