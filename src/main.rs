@@ -2,7 +2,7 @@ use geng::prelude::*;
 
 mod assets;
 mod game;
-mod gltf;
+mod gltf_load;
 mod loading_screen;
 
 use assets::*;

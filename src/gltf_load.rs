@@ -37,9 +37,12 @@ pub struct Mesh {
     pub material: Material,
 }
 
-pub async fn load_meshes(path: impl AsRef<std::path::Path>) -> Vec<Mesh> {
-    let file = load_file(path.as_ref()).await;
-    let (document, buffers, images) = gltf::import_slice(file).unwrap();
+pub async fn load_meshes(
+    geng: &Geng,
+    path: impl AsRef<std::path::Path>,
+) -> anyhow::Result<Vec<Mesh>> {
+    let file = load_file(path.as_ref()).await?;
+    let (document, buffers, images) = gltf::import_slice(&file).unwrap();
     let mut meshes = Vec::new();
     for mesh in document.meshes() {
         info!("{:?}", mesh.name());
@@ -97,5 +100,5 @@ pub async fn load_meshes(path: impl AsRef<std::path::Path>) -> Vec<Mesh> {
             meshes.push(Mesh { data, material });
         }
     }
-    meshes
+    Ok(meshes)
 }
