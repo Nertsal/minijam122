@@ -5,12 +5,15 @@ mod camera;
 mod game;
 mod gltf_load;
 mod loading_screen;
+mod model;
+mod util;
 
 use assets::*;
 use camera::Camera;
 use game::Game;
 use gltf_load::*;
 use loading_screen::LoadingScreen;
+use model::*;
 
 fn main() {
     logger::init().unwrap();
