@@ -18,7 +18,7 @@ pub struct Game {
 
 enum Control {
     Disabled,
-    Direction { time: Time },
+    Direction,
     Power { direction: Vec2<Coord>, time: Time },
 }
 

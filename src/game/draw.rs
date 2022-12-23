@@ -16,9 +16,11 @@ impl Game {
         // Control
         match &self.control {
             Control::Disabled => {}
-            Control::Direction { time } => {
+            Control::Direction => {
+                let direction = self.screen_pos_to_move_dir(self.geng.window().mouse_pos());
+                let angle = direction.arg();
                 let matrix = Mat4::translate(self.player.position)
-                    * Mat4::rotate_z(*time)
+                    * Mat4::rotate_z(angle)
                     * Mat4::scale_uniform(Coord::new(0.2));
                 self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
             }

@@ -32,10 +32,11 @@ impl Game {
         match &mut self.control {
             Control::Disabled => {
                 if player.velocity.len().as_f32() < 0.01 {
-                    self.control = Control::Direction { time: Time::ZERO };
+                    self.control = Control::Direction;
                 }
             }
-            Control::Direction { time } | Control::Power { time, .. } => {
+            Control::Direction => {}
+            Control::Power { time, .. } => {
                 *time += delta_time;
             }
         }

@@ -40,9 +40,8 @@ impl Game {
     fn click(&mut self, position: Vec2<f64>) {
         match self.control {
             Control::Disabled => return,
-            Control::Direction { time } => {
-                let (sin, cos) = time.sin_cos();
-                let direction = vec2(cos, sin);
+            Control::Direction => {
+                let direction = self.screen_pos_to_move_dir(self.geng.window().mouse_pos());
                 self.control = Control::Power {
                     direction,
                     time: Time::ZERO,
@@ -54,5 +53,23 @@ impl Game {
                 self.control = Control::Disabled;
             }
         }
+    }
+
+    pub fn screen_pos_to_move_dir(&self, position: Vec2<f64>) -> Vec2<Coord> {
+        let ray = self.camera.pixel_ray(
+            self.framebuffer_size.map(|x| x as f32),
+            position.map(|x| x as f32),
+        );
+        let cast = util::intersect_ray_with_closest(
+            self.assets
+                .level
+                .iter()
+                .flat_map(|mesh| mesh.data.chunks(3))
+                .map(|vs| [vs[0].a_pos, vs[1].a_pos, vs[2].a_pos]),
+            0.0,
+            ray,
+        );
+        cast.map(|cast| (ray.dir * cast).xy().map(Coord::new) - self.player.position.xy())
+            .unwrap_or(Vec2::ZERO)
     }
 }
