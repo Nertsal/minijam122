@@ -1,12 +1,15 @@
 use geng::prelude::*;
 
 mod assets;
+mod camera;
 mod game;
 mod gltf_load;
 mod loading_screen;
 
 use assets::*;
+use camera::Camera;
 use game::Game;
+use gltf_load::*;
 use loading_screen::LoadingScreen;
 
 fn main() {
@@ -47,7 +50,7 @@ fn main() {
         geng::LoadingScreen::new(
             &geng,
             LoadingScreen::new(&geng),
-            <Assets as geng::LoadAsset>::load(&geng, &static_path().join("assets")),
+            <Assets as geng::LoadAsset>::load(&geng, &static_path()),
             {
                 let geng = geng.clone();
                 move |assets| Game::new(&geng, &Rc::new(assets.unwrap()))
