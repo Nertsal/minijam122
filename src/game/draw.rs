@@ -3,7 +3,12 @@ use super::*;
 impl Game {
     pub fn draw(&mut self, framebuffer: &mut ugli::Framebuffer) {
         self.framebuffer_size = framebuffer.size();
-        ugli::clear(framebuffer, Some(Rgba::BLACK), Some(1.0), None);
+        ugli::clear(
+            framebuffer,
+            Some(Rgba::new(0.8, 0.8, 1.0, 1.0)),
+            Some(1.0),
+            None,
+        );
 
         // Level
         self.draw_gltf(&self.assets.level, Mat4::identity(), framebuffer);
@@ -187,8 +192,8 @@ impl Game {
                     },
                 );
             };
-            draw_outline(0.03);
-            draw_outline(-0.03);
+            // draw_outline(0.03);
+            // draw_outline(-0.03);
         }
     }
 }
