@@ -16,6 +16,9 @@ pub struct Game {
     delayed_input: Option<Time>,
     control: Control,
     quad_geometry: ugli::VertexBuffer<draw_2d::Vertex>,
+    outline_texture: RefCell<ugli::Texture>,
+    color_texture: RefCell<ugli::Texture>,
+    depth_buffer: RefCell<ugli::Renderbuffer<ugli::DepthComponent>>,
 }
 
 enum Control {
@@ -39,6 +42,12 @@ enum Control {
 impl Game {
     pub fn new(geng: &Geng, assets: &Rc<Assets>) -> Self {
         Self {
+            color_texture: RefCell::new(ugli::Texture::new_uninitialized(geng.ugli(), vec2(1, 1))),
+            outline_texture: RefCell::new(ugli::Texture::new_uninitialized(
+                geng.ugli(),
+                vec2(1, 1),
+            )),
+            depth_buffer: RefCell::new(ugli::Renderbuffer::new(geng.ugli(), vec2(1, 1))),
             quad_geometry: ugli::VertexBuffer::new_static(
                 geng.ugli(),
                 vec![

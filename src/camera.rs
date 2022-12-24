@@ -27,8 +27,8 @@ impl geng::AbstractCamera3d for Camera {
         Mat4::perspective(
             self.fov,
             framebuffer_size.x / framebuffer_size.y,
-            0.1,
-            1000.0,
+            1.0,
+            100.0,
         )
     }
 }
