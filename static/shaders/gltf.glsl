@@ -25,7 +25,7 @@ uniform mat4 u_model_matrix;
 void main() {
     v_uv = a_uv;
     v_mr_uv = a_mr_uv;
-    v_color = a_color;
+    v_color = pow(a_color, vec4(1.0 / 2.2));
     v_world_pos = vec4_to_3(u_model_matrix * vec4(a_pos, 1.0));
     v_normal = normalize(vec3(u_model_matrix * vec4(a_normal, 0.0)));
     gl_Position = u_projection_matrix * u_view_matrix * vec4(v_world_pos, 1.0);

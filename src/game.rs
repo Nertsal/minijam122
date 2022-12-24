@@ -17,6 +17,7 @@ pub struct Game {
     player: Player,
     delayed_input: Option<Time>,
     control: Control,
+    quad_geometry: ugli::VertexBuffer<draw_2d::Vertex>,
 }
 
 enum Control {
@@ -40,6 +41,23 @@ enum Control {
 impl Game {
     pub fn new(geng: &Geng, assets: &Rc<Assets>) -> Self {
         Self {
+            quad_geometry: ugli::VertexBuffer::new_static(
+                geng.ugli(),
+                vec![
+                    draw_2d::Vertex {
+                        a_pos: vec2(0.0, 0.0),
+                    },
+                    draw_2d::Vertex {
+                        a_pos: vec2(1.0, 0.0),
+                    },
+                    draw_2d::Vertex {
+                        a_pos: vec2(1.0, 1.0),
+                    },
+                    draw_2d::Vertex {
+                        a_pos: vec2(0.0, 1.0),
+                    },
+                ],
+            ),
             geng: geng.clone(),
             assets: assets.clone(),
             framebuffer_size: vec2(1, 1),
