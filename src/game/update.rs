@@ -63,6 +63,9 @@ impl Game {
                     self.control = Control::Direction;
                 }
             }
+            _ if self.player.velocity.len().as_f32() > 0.01 => {
+                self.control = Control::Disabled;
+            }
             Control::Direction => {}
             Control::Power { time, .. } | Control::Precision { time, .. } => {
                 *time += delta_time;
