@@ -7,6 +7,7 @@ mod gltf_load;
 mod loading_screen;
 mod menu;
 mod model;
+mod render;
 mod util;
 
 use assets::*;
@@ -16,6 +17,7 @@ use gltf_load::*;
 use loading_screen::LoadingScreen;
 use menu::Menu;
 use model::*;
+use render::*;
 
 fn main() {
     logger::init().unwrap();

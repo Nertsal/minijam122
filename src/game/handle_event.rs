@@ -29,14 +29,14 @@ impl Game {
             }
             geng::Event::MouseMove { delta, .. } if self.controlling_camera => {
                 let sensitivity = 0.01;
-                self.camera.rot_h += -delta.x as f32 * sensitivity;
-                self.camera.rot_v =
-                    (self.camera.rot_v + delta.y as f32 * sensitivity).clamp(0.0, f32::PI);
+                self.render.camera.rot_h += -delta.x as f32 * sensitivity;
+                self.render.camera.rot_v =
+                    (self.render.camera.rot_v + delta.y as f32 * sensitivity).clamp(0.0, f32::PI);
             }
             geng::Event::Wheel { delta } => {
                 let sensitivity = 0.01;
-                self.camera.distance =
-                    (self.camera.distance - delta as f32 * sensitivity).clamp(1.0, 7.5);
+                self.render.camera.distance =
+                    (self.render.camera.distance - delta as f32 * sensitivity).clamp(1.0, 7.5);
             }
             geng::Event::KeyDown { key } => match key {
                 geng::Key::R if self.geng.window().is_key_pressed(geng::Key::LCtrl) => {
@@ -62,7 +62,7 @@ impl Game {
             Control::Disabled | Control::Hitting { .. } => {}
             Control::Direction => {
                 if !self.player.finished {
-                    let direction = self.screen_pos_to_move_dir(position);
+                    let direction = self.render.screen_pos_to_move_dir(position, &self.player);
                     self.control = Control::Power {
                         direction,
                         time: Time::ZERO,
@@ -105,7 +105,7 @@ impl Game {
     }
 
     pub fn raycast_to_mouse(&self, position: Vec2<f64>) -> Option<Vec3<Coord>> {
-        let ray = self.camera.pixel_ray(
+        let ray = self.render.camera.pixel_ray(
             self.framebuffer_size.map(|x| x as f32),
             position.map(|x| x as f32),
         );
@@ -119,19 +119,5 @@ impl Game {
             ray,
         );
         cast.map(|cast| (ray.from + ray.dir * cast).map(Coord::new))
-    }
-
-    pub fn screen_pos_to_move_dir(&self, position: Vec2<f64>) -> Vec2<Coord> {
-        let ray = self.camera.pixel_ray(
-            self.framebuffer_size.map(|x| x as f32),
-            position.map(|x| x as f32),
-        );
-        let t = util::intersect_ray_with_plane(
-            vec3(0.0, 0.0, 1.0),
-            -self.player.position.z.as_f32(),
-            ray,
-        );
-        let raycast = (ray.from + ray.dir * t).map(Coord::new);
-        -(raycast.xy() - self.player.position.xy()).normalize_or_zero()
     }
 }

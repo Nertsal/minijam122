@@ -11,19 +11,15 @@ type Time = R32;
 pub struct Game {
     geng: Geng,
     assets: Rc<Assets>,
+    render: Render,
     framebuffer_size: Vec2<usize>,
-    camera: Camera,
     controlling_camera: bool,
     player: Player,
     delayed_input: Option<Time>,
     control: Control,
-    quad_geometry: ugli::VertexBuffer<draw_2d::Vertex>,
-    outline_texture: RefCell<ugli::Texture>,
-    color_texture: RefCell<ugli::Texture>,
-    depth_buffer: RefCell<ugli::Renderbuffer<ugli::DepthComponent>>,
 }
 
-enum Control {
+pub enum Control {
     Disabled,
     Direction,
     Power {
@@ -44,39 +40,10 @@ enum Control {
 impl Game {
     pub fn new(geng: &Geng, assets: &Rc<Assets>) -> Self {
         Self {
-            color_texture: RefCell::new(ugli::Texture::new_uninitialized(geng.ugli(), vec2(1, 1))),
-            outline_texture: RefCell::new(ugli::Texture::new_uninitialized(
-                geng.ugli(),
-                vec2(1, 1),
-            )),
-            depth_buffer: RefCell::new(ugli::Renderbuffer::new(geng.ugli(), vec2(1, 1))),
-            quad_geometry: ugli::VertexBuffer::new_static(
-                geng.ugli(),
-                vec![
-                    draw_2d::Vertex {
-                        a_pos: vec2(0.0, 0.0),
-                    },
-                    draw_2d::Vertex {
-                        a_pos: vec2(1.0, 0.0),
-                    },
-                    draw_2d::Vertex {
-                        a_pos: vec2(1.0, 1.0),
-                    },
-                    draw_2d::Vertex {
-                        a_pos: vec2(0.0, 1.0),
-                    },
-                ],
-            ),
+            render: Render::new(geng, assets),
             geng: geng.clone(),
             assets: assets.clone(),
             framebuffer_size: vec2(1, 1),
-            camera: Camera {
-                fov: f32::PI / 3.0,
-                pos: vec3(0.0, 0.0, 1.0),
-                distance: 5.0,
-                rot_h: 0.0,
-                rot_v: f32::PI / 3.0,
-            },
             controlling_camera: false,
             player: Player::new(),
             delayed_input: None,
