@@ -49,17 +49,7 @@ impl Game {
                 rot_v: f32::PI / 3.0,
             },
             controlling_camera: false,
-            player: Player {
-                id: Id(0),
-                position: vec3(0.0, 0.0, 1.1).map(Coord::new),
-                velocity: Vec3::ZERO,
-                radius: Coord::new(0.1),
-                color: Rgba::RED,
-                last_shot: Vec3::ZERO,
-                fatigue: R32::ZERO,
-                hits: 0,
-                deaths: 0,
-            },
+            player: Player::new(),
             delayed_input: None,
             control: Control::Disabled,
         }
