@@ -3,12 +3,24 @@ use super::*;
 impl Game {
     fn draw_impl(&self, framebuffer: &mut ugli::Framebuffer, program: &ugli::Program) {
         // Level
-        self.draw_gltf(&self.assets.level, program, Mat4::identity(), framebuffer);
+        draw_gltf(
+            &self.assets.level,
+            program,
+            Mat4::identity(),
+            framebuffer,
+            &self.camera,
+        );
 
         // Players
         let matrix =
             Mat4::translate(self.player.position) * Mat4::scale_uniform(self.player.radius);
-        self.draw_gltf(&self.assets.player, program, matrix, framebuffer);
+        draw_gltf(
+            &self.assets.player,
+            program,
+            matrix,
+            framebuffer,
+            &self.camera,
+        );
 
         // Control
         if !self.player.finished {
@@ -20,14 +32,26 @@ impl Game {
                     let matrix = Mat4::translate(self.player.position)
                         * Mat4::rotate_z(angle)
                         * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.arrow, program, matrix, framebuffer);
+                    draw_gltf(
+                        &self.assets.arrow,
+                        program,
+                        matrix,
+                        framebuffer,
+                        &self.camera,
+                    );
                     let matrix = Mat4::translate(
                         self.player.position
                             - direction.extend(Coord::ZERO)
                                 * (self.player.radius + Coord::new(0.2)),
                     ) * Mat4::rotate_z(angle)
                         * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, program, matrix, framebuffer);
+                    draw_gltf(
+                        &self.assets.club,
+                        program,
+                        matrix,
+                        framebuffer,
+                        &self.camera,
+                    );
                 }
                 Control::Power { direction, time } => {
                     let angle = direction.arg();
@@ -35,14 +59,26 @@ impl Game {
                     let matrix = Mat4::translate(self.player.position)
                         * Mat4::rotate_z(angle)
                         * Mat4::scale(vec3(0.2 + power.as_f32() * 0.1, 0.2, 0.2).map(Coord::new));
-                    self.draw_gltf(&self.assets.arrow, program, matrix, framebuffer);
+                    draw_gltf(
+                        &self.assets.arrow,
+                        program,
+                        matrix,
+                        framebuffer,
+                        &self.camera,
+                    );
                     let matrix = Mat4::translate(
                         self.player.position
                             - direction.extend(Coord::ZERO)
                                 * (self.player.radius + Coord::new(0.2 + power.as_f32() * 0.2)),
                     ) * Mat4::rotate_z(angle)
                         * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, program, matrix, framebuffer);
+                    draw_gltf(
+                        &self.assets.club,
+                        program,
+                        matrix,
+                        framebuffer,
+                        &self.camera,
+                    );
                 }
                 Control::Precision {
                     direction,
@@ -56,14 +92,26 @@ impl Game {
                     let matrix = Mat4::translate(self.player.position)
                         * Mat4::rotate_z(angle)
                         * Mat4::scale(vec3(0.2 + power.as_f32() * 0.1, 0.2, 0.2).map(Coord::new));
-                    self.draw_gltf(&self.assets.arrow, program, matrix, framebuffer);
+                    draw_gltf(
+                        &self.assets.arrow,
+                        program,
+                        matrix,
+                        framebuffer,
+                        &self.camera,
+                    );
                     let matrix = Mat4::translate(
                         self.player.position
                             - direction.extend(Coord::ZERO)
                                 * (self.player.radius + Coord::new(0.2 + power.as_f32() * 0.2)),
                     ) * Mat4::rotate_z(angle)
                         * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, program, matrix, framebuffer);
+                    draw_gltf(
+                        &self.assets.club,
+                        program,
+                        matrix,
+                        framebuffer,
+                        &self.camera,
+                    );
                 }
                 Control::Hitting { time, hit } => {
                     let direction = hit.xy().normalize_or_zero();
@@ -79,7 +127,13 @@ impl Game {
                                 * (self.player.radius + far * Coord::new(t)),
                     ) * Mat4::rotate_z(angle)
                         * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, program, matrix, framebuffer);
+                    draw_gltf(
+                        &self.assets.club,
+                        program,
+                        matrix,
+                        framebuffer,
+                        &self.camera,
+                    );
                 }
             }
         }
@@ -223,38 +277,37 @@ impl Game {
             );
         }
     }
-
-    fn draw_gltf<'a>(
-        &'a self,
-        gltf: impl IntoIterator<Item = &'a Mesh>,
-        program: &ugli::Program,
-        matrix: Mat4<Coord>,
-        framebuffer: &'a mut ugli::Framebuffer,
-    ) {
-        for mesh in gltf.into_iter() {
-            let matrix = matrix.map(|x| x.as_f32()); // * mesh.transform;
-            ugli::draw(
-                framebuffer,
-                program,
-                ugli::DrawMode::Triangles,
-                &mesh.data,
-                (
-                    mesh.material.uniforms(),
-                    ugli::uniforms! {
-                        u_model_matrix: matrix,
-                        u_eye_pos: self.camera.eye_pos(),
-                        u_light_dir: vec3(1.0, -2.0, 5.0),
-                        u_light_color: Rgba::WHITE,
-                        u_ambient_light_color: Rgba::WHITE,
-                        u_ambient_light_intensity: 0.8,
-                    },
-                    geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
-                ),
-                ugli::DrawParameters {
-                    depth_func: Some(ugli::DepthFunc::Less),
-                    ..default()
+}
+pub fn draw_gltf<'a>(
+    gltf: impl IntoIterator<Item = &'a Mesh>,
+    program: &ugli::Program,
+    matrix: Mat4<Coord>,
+    framebuffer: &'a mut ugli::Framebuffer,
+    camera: &Camera,
+) {
+    for mesh in gltf.into_iter() {
+        let matrix = matrix.map(|x| x.as_f32()); // * mesh.transform;
+        ugli::draw(
+            framebuffer,
+            program,
+            ugli::DrawMode::Triangles,
+            &mesh.data,
+            (
+                mesh.material.uniforms(),
+                ugli::uniforms! {
+                    u_model_matrix: matrix,
+                    u_eye_pos: camera.eye_pos(),
+                    u_light_dir: vec3(1.0, -2.0, 5.0),
+                    u_light_color: Rgba::WHITE,
+                    u_ambient_light_color: Rgba::WHITE,
+                    u_ambient_light_intensity: 0.8,
                 },
-            );
-        }
+                geng::camera3d_uniforms(camera, framebuffer.size().map(|x| x as f32)),
+            ),
+            ugli::DrawParameters {
+                depth_func: Some(ugli::DepthFunc::Less),
+                ..default()
+            },
+        );
     }
 }

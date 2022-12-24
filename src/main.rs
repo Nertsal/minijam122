@@ -5,14 +5,16 @@ mod camera;
 mod game;
 mod gltf_load;
 mod loading_screen;
+mod menu;
 mod model;
 mod util;
 
 use assets::*;
 use camera::Camera;
-use game::Game;
+use game::*;
 use gltf_load::*;
 use loading_screen::LoadingScreen;
+use menu::Menu;
 use model::*;
 
 fn main() {
@@ -57,7 +59,7 @@ fn main() {
             <Assets as geng::LoadAsset>::load(&geng, &static_path()),
             {
                 let geng = geng.clone();
-                move |assets| Game::new(&geng, &Rc::new(assets.unwrap()))
+                move |assets| Menu::new(&geng, &Rc::new(assets.unwrap()))
             },
         ),
     );

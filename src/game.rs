@@ -4,6 +4,8 @@ mod draw;
 mod handle_event;
 mod update;
 
+pub use draw::*;
+
 type Time = R32;
 
 pub struct Game {
