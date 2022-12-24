@@ -38,7 +38,7 @@ fn main() {
 
     let geng = Geng::new_with(geng::ContextOptions {
         title: "Untitled Golf Game".to_string(),
-        vsync: false,
+        vsync: true,
         fixed_delta_time: 1.0 / 200.0,
         ..default()
     });
