@@ -167,21 +167,13 @@ impl Game {
         matrix: Mat4<Coord>,
         framebuffer: &'a mut ugli::Framebuffer,
     ) {
-        draw_gltf(
-            gltf,
-            matrix,
-            &self.geng,
-            &*self.assets,
-            framebuffer,
-            &self.camera,
-        )
+        draw_gltf(gltf, matrix, &*self.assets, framebuffer, &self.camera)
     }
 }
 
 pub fn draw_gltf<'a>(
     gltf: impl IntoIterator<Item = &'a Mesh>,
     matrix: Mat4<Coord>,
-    geng: &'a Geng,
     assets: &'a Assets,
     framebuffer: &'a mut ugli::Framebuffer,
     camera: &'a Camera,
