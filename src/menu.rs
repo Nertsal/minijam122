@@ -6,12 +6,30 @@ pub struct Menu {
     camera: Camera,
     framebuffer_size: Vec2<usize>,
     transition: Option<geng::Transition>,
+    quad_geometry: ugli::VertexBuffer<draw_2d::Vertex>,
     time: f32,
 }
 
 impl Menu {
     pub fn new(geng: &Geng, assets: &Rc<Assets>) -> Self {
         Self {
+            quad_geometry: ugli::VertexBuffer::new_static(
+                geng.ugli(),
+                vec![
+                    draw_2d::Vertex {
+                        a_pos: vec2(0.0, 0.0),
+                    },
+                    draw_2d::Vertex {
+                        a_pos: vec2(1.0, 0.0),
+                    },
+                    draw_2d::Vertex {
+                        a_pos: vec2(1.0, 1.0),
+                    },
+                    draw_2d::Vertex {
+                        a_pos: vec2(0.0, 1.0),
+                    },
+                ],
+            ),
             geng: geng.clone(),
             assets: assets.clone(),
             camera: Camera {
@@ -40,10 +58,41 @@ impl Menu {
 impl geng::State for Menu {
     fn draw(&mut self, framebuffer: &mut ugli::Framebuffer) {
         self.framebuffer_size = framebuffer.size();
-        ugli::clear(framebuffer, Some(Rgba::BLACK), Some(1.0), None);
 
-        // Level in the background
-        self.draw_gltf(&self.assets.level, Mat4::identity(), framebuffer);
+        let texture = {
+            // TODO: create not on every frame
+            let mut postprocess_texture =
+                ugli::Texture::new_uninitialized(self.geng.ugli(), framebuffer.size());
+            let mut depth_buffer = ugli::Renderbuffer::new(self.geng.ugli(), framebuffer.size());
+            let mut framebuffer = ugli::Framebuffer::new(
+                self.geng.ugli(),
+                ugli::ColorAttachment::Texture(&mut postprocess_texture),
+                ugli::DepthAttachment::Renderbuffer(&mut depth_buffer),
+            );
+            let framebuffer = &mut framebuffer;
+            ugli::clear(
+                framebuffer,
+                Some(Rgba::new(0.8, 0.8, 1.0, 1.0)),
+                Some(1.0),
+                None,
+            );
+
+            // Level in the background
+            self.draw_gltf(&self.assets.level, Mat4::identity(), framebuffer);
+            postprocess_texture
+        };
+
+        ugli::draw(
+            framebuffer,
+            &self.assets.shaders.postprocess,
+            ugli::DrawMode::TriangleFan,
+            &self.quad_geometry,
+            ugli::uniforms! {
+                u_texture_size: texture.size().map(|x| x as f32),
+                u_texture: texture,
+            },
+            ugli::DrawParameters { ..default() },
+        );
     }
 
     fn update(&mut self, delta_time: f64) {
