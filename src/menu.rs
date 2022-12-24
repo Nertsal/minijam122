@@ -51,7 +51,13 @@ impl Menu {
         matrix: Mat4<Coord>,
         framebuffer: &'a mut ugli::Framebuffer,
     ) {
-        draw_gltf(gltf, matrix, &self.assets, framebuffer, &self.camera)
+        draw_gltf(
+            gltf,
+            &self.assets.shaders.gltf,
+            matrix,
+            framebuffer,
+            &self.camera,
+        )
     }
 }
 
