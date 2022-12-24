@@ -39,15 +39,17 @@ impl Game {
                     (self.camera.distance - delta as f32 * sensitivity).clamp(1.0, 7.5);
             }
             geng::Event::KeyDown { key } => match key {
-                geng::Key::R => {
-                    self.player.position = Vec3::ZERO;
-                    self.player.velocity = Vec3::ZERO;
+                geng::Key::R if self.geng.window().is_key_pressed(geng::Key::LCtrl) => {
+                    self.player = Player::new();
                 }
                 geng::Key::T => {
                     if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
                         self.player.position = pos + Vec2::ZERO.extend(self.player.radius);
                         self.player.velocity = Vec3::ZERO;
                     }
+                }
+                geng::Key::P => {
+                    println!("Current player position: {:?}", self.player.position);
                 }
                 _ => {}
             },
@@ -59,11 +61,13 @@ impl Game {
         match self.control {
             Control::Disabled | Control::Hitting { .. } => {}
             Control::Direction => {
-                let direction = self.screen_pos_to_move_dir(position);
-                self.control = Control::Power {
-                    direction,
-                    time: Time::ZERO,
-                };
+                if !self.player.finished {
+                    let direction = self.screen_pos_to_move_dir(position);
+                    self.control = Control::Power {
+                        direction,
+                        time: Time::ZERO,
+                    };
+                }
             }
             Control::Power { .. } | Control::Precision { .. } => {
                 if self.delayed_input.is_none() {

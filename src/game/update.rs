@@ -10,6 +10,14 @@ impl Game {
 
         let mut drag = 0.0;
 
+        // Check finish
+        if !self.player.finished {
+            let finish = vec3(3.911, -4.034, 0.076).map(Coord::new); // Hardcode
+            if (self.player.position - finish).len() < self.player.radius {
+                self.player.finished = true;
+            }
+        }
+
         // Player-Water collisions
         let player = &mut self.player;
         if player.position.z - player.radius < Coord::new(-5.1) {
