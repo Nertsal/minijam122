@@ -115,24 +115,33 @@ impl Game {
                     ..default()
                 },
             );
-            ugli::draw(
-                framebuffer,
-                &self.assets.shaders.gltf_outline,
-                ugli::DrawMode::Triangles,
-                &mesh.data,
-                (
-                    ugli::uniforms! {
-                        u_model_matrix: matrix,
+            let mut draw_outline = |offset: f32| {
+                ugli::draw(
+                    framebuffer,
+                    &self.assets.shaders.gltf_outline,
+                    ugli::DrawMode::Triangles,
+                    &mesh.data,
+                    (
+                        ugli::uniforms! {
+                            u_model_matrix: matrix,
+                            u_offset: offset,
+                        },
+                        geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
+                    ),
+                    ugli::DrawParameters {
+                        depth_func: Some(ugli::DepthFunc::Less),
+                        cull_face: Some(if offset > 0.0 {
+                            ugli::CullFace::Front
+                        } else {
+                            ugli::CullFace::Back
+                        }),
+                        blend_mode: Some(ugli::BlendMode::default()),
+                        ..default()
                     },
-                    geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
-                ),
-                ugli::DrawParameters {
-                    depth_func: Some(ugli::DepthFunc::Less),
-                    cull_face: Some(ugli::CullFace::Front),
-                    blend_mode: Some(ugli::BlendMode::default()),
-                    ..default()
-                },
-            );
+                );
+            };
+            draw_outline(0.03);
+            draw_outline(-0.03);
         }
     }
 }
