@@ -51,7 +51,7 @@ impl Game {
             controlling_camera: false,
             player: Player {
                 id: Id(0),
-                position: Vec3::ZERO,
+                position: vec3(0.0, 0.0, 0.1).map(Coord::new),
                 velocity: Vec3::ZERO,
                 radius: Coord::new(0.1),
                 color: Rgba::RED,
