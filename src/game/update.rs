@@ -1,23 +1,18 @@
 use super::*;
 
 const GRAVITY: Vec3<f32> = vec3(0.0, 0.0, -9.8);
-const DRAG: f32 = 1.0;
 
 impl Game {
     pub fn update(&mut self, delta_time: Time) {
         // Movement
-        self.player.velocity *= Coord::ONE
-            - Coord::new(if self.player.velocity.len() > Coord::ONE {
-                DRAG
-            } else {
-                2.0
-            }) * delta_time;
         self.player.velocity += GRAVITY.map(Coord::new) * delta_time;
         self.player.position += self.player.velocity * delta_time;
 
+        let mut drag = 0.0;
+
         // Player-Water collisions
         let player = &mut self.player;
-        if player.position.z - player.radius < Coord::new(-1.1) {
+        if player.position.z - player.radius < Coord::new(-5.1) {
             self.player_death();
         }
 
@@ -47,8 +42,18 @@ impl Game {
                 let n = v.normalize_or_zero();
                 player.velocity -= n * Vec3::dot(n, player.velocity) * Coord::new(1.0 + bounciness);
                 player.position += n * (player.radius - len);
+
+                drag = if n.xy() != Vec2::ZERO {
+                    0.2
+                } else if self.player.velocity.len() > Coord::ONE {
+                    1.0
+                } else {
+                    2.0
+                }
             }
         }
+
+        self.player.velocity *= Coord::ONE - Coord::new(drag) * delta_time;
 
         // Camera interpolation
         let interpolation = 1.0 / 0.5;
