@@ -167,57 +167,75 @@ impl Game {
         matrix: Mat4<Coord>,
         framebuffer: &'a mut ugli::Framebuffer,
     ) {
-        for mesh in gltf.into_iter() {
-            let matrix = matrix.map(|x| x.as_f32()); // * mesh.transform;
+        draw_gltf(
+            gltf,
+            matrix,
+            &self.geng,
+            &*self.assets,
+            framebuffer,
+            &self.camera,
+        )
+    }
+}
+
+pub fn draw_gltf<'a>(
+    gltf: impl IntoIterator<Item = &'a Mesh>,
+    matrix: Mat4<Coord>,
+    geng: &'a Geng,
+    assets: &'a Assets,
+    framebuffer: &'a mut ugli::Framebuffer,
+    camera: &'a Camera,
+) {
+    for mesh in gltf.into_iter() {
+        let matrix = matrix.map(|x| x.as_f32()); // * mesh.transform;
+        ugli::draw(
+            framebuffer,
+            &assets.shaders.gltf,
+            ugli::DrawMode::Triangles,
+            &mesh.data,
+            (
+                mesh.material.uniforms(),
+                ugli::uniforms! {
+                    u_model_matrix: matrix,
+                    u_eye_pos: camera.eye_pos(),
+                    u_light_dir: vec3(1.0, -2.0, 5.0),
+                    u_light_color: Rgba::WHITE,
+                    u_ambient_light_color: Rgba::WHITE,
+                    u_ambient_light_intensity: 0.8,
+                },
+                geng::camera3d_uniforms(camera, framebuffer.size().map(|x| x as f32)),
+            ),
+            ugli::DrawParameters {
+                depth_func: Some(ugli::DepthFunc::Less),
+                ..default()
+            },
+        );
+        let mut draw_outline = |offset: f32| {
             ugli::draw(
                 framebuffer,
-                &self.assets.shaders.gltf,
+                &assets.shaders.gltf_outline,
                 ugli::DrawMode::Triangles,
                 &mesh.data,
                 (
-                    mesh.material.uniforms(),
                     ugli::uniforms! {
                         u_model_matrix: matrix,
-                        u_eye_pos: self.camera.eye_pos(),
-                        u_light_dir: vec3(1.0, -2.0, 5.0),
-                        u_light_color: Rgba::WHITE,
-                        u_ambient_light_color: Rgba::WHITE,
-                        u_ambient_light_intensity: 0.8,
+                        u_offset: offset,
                     },
-                    geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
+                    geng::camera3d_uniforms(camera, framebuffer.size().map(|x| x as f32)),
                 ),
                 ugli::DrawParameters {
                     depth_func: Some(ugli::DepthFunc::Less),
+                    cull_face: Some(if offset > 0.0 {
+                        ugli::CullFace::Front
+                    } else {
+                        ugli::CullFace::Back
+                    }),
+                    blend_mode: Some(ugli::BlendMode::default()),
                     ..default()
                 },
             );
-            let mut draw_outline = |offset: f32| {
-                ugli::draw(
-                    framebuffer,
-                    &self.assets.shaders.gltf_outline,
-                    ugli::DrawMode::Triangles,
-                    &mesh.data,
-                    (
-                        ugli::uniforms! {
-                            u_model_matrix: matrix,
-                            u_offset: offset,
-                        },
-                        geng::camera3d_uniforms(&self.camera, framebuffer.size().map(|x| x as f32)),
-                    ),
-                    ugli::DrawParameters {
-                        depth_func: Some(ugli::DepthFunc::Less),
-                        cull_face: Some(if offset > 0.0 {
-                            ugli::CullFace::Front
-                        } else {
-                            ugli::CullFace::Back
-                        }),
-                        blend_mode: Some(ugli::BlendMode::default()),
-                        ..default()
-                    },
-                );
-            };
-            draw_outline(0.03);
-            draw_outline(-0.03);
-        }
+        };
+        draw_outline(0.03);
+        draw_outline(-0.03);
     }
 }
