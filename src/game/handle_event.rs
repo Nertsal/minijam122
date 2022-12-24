@@ -65,6 +65,17 @@ impl Game {
                     time: Time::ZERO,
                 };
             }
+            Control::Power { .. } | Control::Precision { .. } => {
+                if self.delayed_input.is_none() {
+                    let delay = self.player.fatigue;
+                    self.delayed_input = Some(delay);
+                }
+            }
+        }
+    }
+
+    pub fn control(&mut self) {
+        match self.control {
             Control::Power { direction, time } => {
                 let power = Coord::new((1.0 - time.as_f32().cos()) * 7.0);
                 self.control = Control::Precision {
@@ -85,6 +96,7 @@ impl Game {
                     hit: (direction * power).extend(Coord::ZERO),
                 };
             }
+            _ => {}
         }
     }
 

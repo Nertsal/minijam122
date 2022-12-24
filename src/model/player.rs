@@ -8,4 +8,5 @@ pub struct Player {
     pub radius: Coord,
     pub color: Rgba<f32>,
     pub last_shot: Vec3<Coord>,
+    pub fatigue: R32,
 }

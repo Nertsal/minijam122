@@ -13,6 +13,7 @@ pub struct Game {
     camera: Camera,
     controlling_camera: bool,
     player: Player,
+    delayed_input: Option<Time>,
     control: Control,
 }
 
@@ -55,7 +56,9 @@ impl Game {
                 radius: Coord::new(0.1),
                 color: Rgba::RED,
                 last_shot: Vec3::ZERO,
+                fatigue: R32::ZERO,
             },
+            delayed_input: None,
             control: Control::Disabled,
         }
     }

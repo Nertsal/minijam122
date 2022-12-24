@@ -56,6 +56,15 @@ impl Game {
         let pos = self.camera.pos;
         self.camera.pos += (target_pos - pos) * interpolation * delta_time.as_f32();
 
+        // Check delayed input
+        if let Some(time) = &mut self.delayed_input {
+            *time -= delta_time;
+            if *time <= Time::ZERO {
+                self.delayed_input = None;
+                self.control();
+            }
+        }
+
         // Update control
         match &mut self.control {
             Control::Disabled => {
@@ -75,6 +84,7 @@ impl Game {
                 if *time >= Time::ONE {
                     self.player.velocity += *hit;
                     self.player.last_shot = self.player.position;
+                    self.player.fatigue += r32(0.2);
                     self.control = Control::Disabled;
                 }
             }
@@ -84,5 +94,6 @@ impl Game {
     pub fn player_death(&mut self) {
         self.player.position = self.player.last_shot;
         self.player.velocity = Vec3::ZERO;
+        self.player.fatigue = R32::ZERO;
     }
 }
