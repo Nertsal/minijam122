@@ -17,4 +17,5 @@ pub struct Assets {
 pub struct Shaders {
     pub gltf: ugli::Program,
     pub gltf_outline: ugli::Program,
+    pub postprocess: ugli::Program,
 }

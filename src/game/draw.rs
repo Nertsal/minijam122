@@ -3,94 +3,123 @@ use super::*;
 impl Game {
     pub fn draw(&mut self, framebuffer: &mut ugli::Framebuffer) {
         self.framebuffer_size = framebuffer.size();
-        ugli::clear(
-            framebuffer,
-            Some(Rgba::new(0.8, 0.8, 1.0, 1.0)),
-            Some(1.0),
-            None,
-        );
 
-        // Level
-        self.draw_gltf(&self.assets.level, Mat4::identity(), framebuffer);
+        let texture = {
+            // TODO: create not on every frame
+            let mut postprocess_texture =
+                ugli::Texture::new_uninitialized(self.geng.ugli(), framebuffer.size());
+            let mut depth_buffer = ugli::Renderbuffer::new(self.geng.ugli(), framebuffer.size());
+            let mut framebuffer = ugli::Framebuffer::new(
+                self.geng.ugli(),
+                ugli::ColorAttachment::Texture(&mut postprocess_texture),
+                ugli::DepthAttachment::Renderbuffer(&mut depth_buffer),
+            );
+            let framebuffer = &mut framebuffer;
+            ugli::clear(
+                framebuffer,
+                Some(Rgba::new(0.8, 0.8, 1.0, 1.0)),
+                Some(1.0),
+                None,
+            );
 
-        // Players
-        let matrix =
-            Mat4::translate(self.player.position) * Mat4::scale_uniform(self.player.radius);
-        self.draw_gltf(&self.assets.player, matrix, framebuffer);
+            // Level
+            self.draw_gltf(&self.assets.level, Mat4::identity(), framebuffer);
 
-        // Control
-        if !self.player.finished {
-            match &self.control {
-                Control::Disabled => {}
-                Control::Direction => {
-                    let direction = self.screen_pos_to_move_dir(self.geng.window().mouse_pos());
-                    let angle = direction.arg();
-                    let matrix = Mat4::translate(self.player.position)
-                        * Mat4::rotate_z(angle)
-                        * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
-                    let matrix = Mat4::translate(
-                        self.player.position
-                            - direction.extend(Coord::ZERO)
-                                * (self.player.radius + Coord::new(0.2)),
-                    ) * Mat4::rotate_z(angle)
-                        * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, matrix, framebuffer);
-                }
-                Control::Power { direction, time } => {
-                    let angle = direction.arg();
-                    let power = Coord::new((1.0 - time.as_f32().cos()) * 2.5);
-                    let matrix = Mat4::translate(self.player.position)
-                        * Mat4::rotate_z(angle)
-                        * Mat4::scale(vec3(0.2 + power.as_f32() * 0.1, 0.2, 0.2).map(Coord::new));
-                    self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
-                    let matrix = Mat4::translate(
-                        self.player.position
-                            - direction.extend(Coord::ZERO)
-                                * (self.player.radius + Coord::new(0.2 + power.as_f32() * 0.2)),
-                    ) * Mat4::rotate_z(angle)
-                        * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, matrix, framebuffer);
-                }
-                Control::Precision {
-                    direction,
-                    power,
-                    time,
-                } => {
-                    let angle = (*time * Coord::new(3.0)).sin() * Coord::new(f32::PI / 12.0);
-                    let direction = direction.rotate(angle);
-                    let angle = direction.arg();
-                    let power = *power * Coord::new(2.5 / 7.0);
-                    let matrix = Mat4::translate(self.player.position)
-                        * Mat4::rotate_z(angle)
-                        * Mat4::scale(vec3(0.2 + power.as_f32() * 0.1, 0.2, 0.2).map(Coord::new));
-                    self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
-                    let matrix = Mat4::translate(
-                        self.player.position
-                            - direction.extend(Coord::ZERO)
-                                * (self.player.radius + Coord::new(0.2 + power.as_f32() * 0.2)),
-                    ) * Mat4::rotate_z(angle)
-                        * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, matrix, framebuffer);
-                }
-                Control::Hitting { time, hit } => {
-                    let direction = hit.xy().normalize_or_zero();
-                    let angle = direction.arg();
-                    let power = hit.len() * Coord::new(2.5 / 7.0);
-                    let far = Coord::new(0.2 + power.as_f32() * 0.2);
-                    let b = 2.0;
-                    let t = time.as_f32();
-                    let t = -(t - 1.0) * (b * t + 1.0);
-                    let matrix = Mat4::translate(
-                        self.player.position
-                            - direction.extend(Coord::ZERO)
-                                * (self.player.radius + far * Coord::new(t)),
-                    ) * Mat4::rotate_z(angle)
-                        * Mat4::scale_uniform(Coord::new(0.2));
-                    self.draw_gltf(&self.assets.club, matrix, framebuffer);
+            // Players
+            let matrix =
+                Mat4::translate(self.player.position) * Mat4::scale_uniform(self.player.radius);
+            self.draw_gltf(&self.assets.player, matrix, framebuffer);
+
+            // Control
+            if !self.player.finished {
+                match &self.control {
+                    Control::Disabled => {}
+                    Control::Direction => {
+                        let direction = self.screen_pos_to_move_dir(self.geng.window().mouse_pos());
+                        let angle = direction.arg();
+                        let matrix = Mat4::translate(self.player.position)
+                            * Mat4::rotate_z(angle)
+                            * Mat4::scale_uniform(Coord::new(0.2));
+                        self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
+                        let matrix = Mat4::translate(
+                            self.player.position
+                                - direction.extend(Coord::ZERO)
+                                    * (self.player.radius + Coord::new(0.2)),
+                        ) * Mat4::rotate_z(angle)
+                            * Mat4::scale_uniform(Coord::new(0.2));
+                        self.draw_gltf(&self.assets.club, matrix, framebuffer);
+                    }
+                    Control::Power { direction, time } => {
+                        let angle = direction.arg();
+                        let power = Coord::new((1.0 - time.as_f32().cos()) * 2.5);
+                        let matrix = Mat4::translate(self.player.position)
+                            * Mat4::rotate_z(angle)
+                            * Mat4::scale(
+                                vec3(0.2 + power.as_f32() * 0.1, 0.2, 0.2).map(Coord::new),
+                            );
+                        self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
+                        let matrix = Mat4::translate(
+                            self.player.position
+                                - direction.extend(Coord::ZERO)
+                                    * (self.player.radius + Coord::new(0.2 + power.as_f32() * 0.2)),
+                        ) * Mat4::rotate_z(angle)
+                            * Mat4::scale_uniform(Coord::new(0.2));
+                        self.draw_gltf(&self.assets.club, matrix, framebuffer);
+                    }
+                    Control::Precision {
+                        direction,
+                        power,
+                        time,
+                    } => {
+                        let angle = (*time * Coord::new(3.0)).sin() * Coord::new(f32::PI / 12.0);
+                        let direction = direction.rotate(angle);
+                        let angle = direction.arg();
+                        let power = *power * Coord::new(2.5 / 7.0);
+                        let matrix = Mat4::translate(self.player.position)
+                            * Mat4::rotate_z(angle)
+                            * Mat4::scale(
+                                vec3(0.2 + power.as_f32() * 0.1, 0.2, 0.2).map(Coord::new),
+                            );
+                        self.draw_gltf(&self.assets.arrow, matrix, framebuffer);
+                        let matrix = Mat4::translate(
+                            self.player.position
+                                - direction.extend(Coord::ZERO)
+                                    * (self.player.radius + Coord::new(0.2 + power.as_f32() * 0.2)),
+                        ) * Mat4::rotate_z(angle)
+                            * Mat4::scale_uniform(Coord::new(0.2));
+                        self.draw_gltf(&self.assets.club, matrix, framebuffer);
+                    }
+                    Control::Hitting { time, hit } => {
+                        let direction = hit.xy().normalize_or_zero();
+                        let angle = direction.arg();
+                        let power = hit.len() * Coord::new(2.5 / 7.0);
+                        let far = Coord::new(0.2 + power.as_f32() * 0.2);
+                        let b = 2.0;
+                        let t = time.as_f32();
+                        let t = -(t - 1.0) * (b * t + 1.0);
+                        let matrix = Mat4::translate(
+                            self.player.position
+                                - direction.extend(Coord::ZERO)
+                                    * (self.player.radius + far * Coord::new(t)),
+                        ) * Mat4::rotate_z(angle)
+                            * Mat4::scale_uniform(Coord::new(0.2));
+                        self.draw_gltf(&self.assets.club, matrix, framebuffer);
+                    }
                 }
             }
-        }
+            postprocess_texture
+        };
+        ugli::draw(
+            framebuffer,
+            &self.assets.shaders.postprocess,
+            ugli::DrawMode::TriangleFan,
+            &self.quad_geometry,
+            ugli::uniforms! {
+                u_texture_size: texture.size().map(|x| x as f32),
+                u_texture: texture,
+            },
+            ugli::DrawParameters { ..default() },
+        );
 
         // UI
         let camera = geng::Camera2d {
