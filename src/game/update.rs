@@ -4,6 +4,10 @@ const GRAVITY: Vec3<f32> = vec3(0.0, 0.0, -9.8);
 
 impl Game {
     pub fn update(&mut self, delta_time: Time) {
+        if !self.player.finished {
+            self.time += delta_time;
+        }
+
         // Movement
         self.player.velocity += GRAVITY.map(Coord::new) * delta_time;
         self.player.position += self.player.velocity * delta_time;

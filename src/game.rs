@@ -17,6 +17,8 @@ pub struct Game {
     player: Player,
     delayed_input: Option<Time>,
     control: Control,
+    time: Time,
+    show_timer: bool,
 }
 
 pub enum Control {
@@ -48,6 +50,8 @@ impl Game {
             player: Player::new(),
             delayed_input: None,
             control: Control::Disabled,
+            time: Time::ZERO,
+            show_timer: false,
         }
     }
 }

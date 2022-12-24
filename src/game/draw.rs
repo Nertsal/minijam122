@@ -2,6 +2,7 @@ use super::*;
 
 impl Game {
     pub fn draw(&mut self, framebuffer: &mut ugli::Framebuffer) {
+        self.framebuffer_size = framebuffer.size();
         self.render
             .draw_world(&self.player, &self.control, framebuffer);
 
@@ -31,11 +32,15 @@ impl Game {
                 0.02,
                 Rgba::WHITE,
             );
+            let (mins, secs, mils) = time(self.time.as_f32());
             self.geng.default_font().draw_with_outline(
                 framebuffer,
                 &camera,
-                &format!("hits: {}\ndeaths: {}", self.player.hits, self.player.deaths),
-                camera_aabb.center() + vec2(0.0, 0.0),
+                &format!(
+                    "hits: {}\ndeaths: {}\n{:02}:{:02}.{:03.0}",
+                    self.player.hits, self.player.deaths, mins, secs, mils
+                ),
+                camera_aabb.center() + vec2(0.0, -2.0),
                 geng::TextAlign::CENTER,
                 1.0,
                 Rgba::BLACK,
@@ -77,5 +82,32 @@ impl Game {
                 Rgba::WHITE,
             );
         }
+
+        if self.show_timer {
+            let (mins, secs, mils) = time(self.time.as_f32());
+            self.geng.default_font().draw_with_outline(
+                framebuffer,
+                &camera,
+                &format!("{:02}:{:02}.{:03.0}", mins, secs, mils),
+                camera_aabb.top_right() + vec2(-0.2, -0.5),
+                geng::TextAlign::RIGHT,
+                0.5,
+                Rgba::BLACK,
+                0.01,
+                Rgba::WHITE,
+            );
+        }
     }
+}
+
+fn time(secs: f32) -> (u32, u32, f32) {
+    let mut time = secs;
+    let mut mins = 0;
+    while time > 60.0 {
+        mins += 1;
+        time -= 60.0;
+    }
+    let secs = time.floor() as u32;
+    let mils = time.fract() * 1000.0;
+    (mins, secs, mils)
 }

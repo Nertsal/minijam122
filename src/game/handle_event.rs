@@ -41,6 +41,7 @@ impl Game {
             geng::Event::KeyDown { key } => match key {
                 geng::Key::R if self.geng.window().is_key_pressed(geng::Key::LCtrl) => {
                     self.player = Player::new();
+                    self.time = Time::ZERO;
                 }
                 geng::Key::T => {
                     if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
@@ -50,6 +51,9 @@ impl Game {
                 }
                 geng::Key::P => {
                     println!("Current player position: {:?}", self.player.position);
+                }
+                geng::Key::F2 => {
+                    self.show_timer = !self.show_timer;
                 }
                 _ => {}
             },
