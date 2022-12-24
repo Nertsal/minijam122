@@ -64,7 +64,7 @@ impl Game {
                 }
             }
             Control::Direction => {}
-            Control::Power { time, .. } => {
+            Control::Power { time, .. } | Control::Precision { time, .. } => {
                 *time += delta_time;
             }
             Control::Hitting { time, hit } => {

@@ -19,8 +19,19 @@ pub struct Game {
 enum Control {
     Disabled,
     Direction,
-    Power { direction: Vec2<Coord>, time: Time },
-    Hitting { time: Time, hit: Vec3<Coord> },
+    Power {
+        direction: Vec2<Coord>,
+        time: Time,
+    },
+    Precision {
+        direction: Vec2<Coord>,
+        power: Coord,
+        time: Time,
+    },
+    Hitting {
+        time: Time,
+        hit: Vec3<Coord>,
+    },
 }
 
 impl Game {

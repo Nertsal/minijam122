@@ -67,6 +67,19 @@ impl Game {
             }
             Control::Power { direction, time } => {
                 let power = Coord::new((1.0 - time.as_f32().cos()) * 7.0);
+                self.control = Control::Precision {
+                    direction,
+                    power,
+                    time: Time::ZERO,
+                };
+            }
+            Control::Precision {
+                direction,
+                power,
+                time,
+            } => {
+                let angle = (time * Coord::new(3.0)).sin() * Coord::new(f32::PI / 12.0);
+                let direction = direction.rotate(angle);
                 self.control = Control::Hitting {
                     time: Time::ZERO,
                     hit: (direction * power).extend(Coord::ZERO),
