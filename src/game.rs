@@ -57,6 +57,8 @@ impl Game {
                 color: Rgba::RED,
                 last_shot: Vec3::ZERO,
                 fatigue: R32::ZERO,
+                hits: 0,
+                deaths: 0,
             },
             delayed_input: None,
             control: Control::Disabled,

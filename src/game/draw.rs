@@ -83,6 +83,53 @@ impl Game {
                 self.draw_gltf(&self.assets.club, matrix, framebuffer);
             }
         }
+
+        // UI
+        let camera = geng::Camera2d {
+            center: Vec2::ZERO,
+            rotation: 0.0,
+            fov: 10.0,
+        };
+        let framebuffer_size = framebuffer.size().map(|x| x as f32);
+        let camera_aabb = AABB::point(camera.center).extend_symmetric(
+            vec2(
+                camera.fov * framebuffer_size.x / framebuffer_size.y,
+                camera.fov,
+            ) / 2.0,
+        );
+        self.geng.default_font().draw_with_outline(
+            framebuffer,
+            &camera,
+            &format!("Hits: {}", self.player.hits),
+            camera_aabb.top_left() + vec2(0.2, -0.5),
+            geng::TextAlign::LEFT,
+            0.5,
+            Rgba::BLACK,
+            0.01,
+            Rgba::WHITE,
+        );
+        self.geng.default_font().draw_with_outline(
+            framebuffer,
+            &camera,
+            &format!("Deaths: {}", self.player.deaths),
+            camera_aabb.top_left() + vec2(0.2, -1.0),
+            geng::TextAlign::LEFT,
+            0.5,
+            Rgba::BLACK,
+            0.01,
+            Rgba::WHITE,
+        );
+        self.geng.default_font().draw_with_outline(
+            framebuffer,
+            &camera,
+            &format!("Fatigue delay: {:.1}s", self.player.fatigue),
+            camera_aabb.top_left() + vec2(0.2, -1.5),
+            geng::TextAlign::LEFT,
+            0.5,
+            Rgba::BLACK,
+            0.01,
+            Rgba::WHITE,
+        );
     }
 
     fn draw_gltf<'a>(

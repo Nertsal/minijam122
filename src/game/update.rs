@@ -84,7 +84,8 @@ impl Game {
                 if *time >= Time::ONE {
                     self.player.velocity += *hit;
                     self.player.last_shot = self.player.position;
-                    self.player.fatigue += r32(0.2);
+                    self.player.fatigue = (self.player.fatigue + r32(0.2)).min(R32::ONE);
+                    self.player.hits += 1;
                     self.control = Control::Disabled;
                 }
             }
@@ -95,5 +96,6 @@ impl Game {
         self.player.position = self.player.last_shot;
         self.player.velocity = Vec3::ZERO;
         self.player.fatigue = R32::ZERO;
+        self.player.deaths += 1;
     }
 }
