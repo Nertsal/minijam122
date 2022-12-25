@@ -10,10 +10,10 @@ impl Game {
                     }
                 }
                 geng::MouseButton::Middle => {
-                    if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
-                        self.player.position = pos + Vec2::ZERO.extend(self.player.radius);
-                        self.player.velocity = Vec3::ZERO;
-                    }
+                    // if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
+                    //     self.player.position = pos + Vec2::ZERO.extend(self.player.radius);
+                    //     self.player.velocity = Vec3::ZERO;
+                    // }
                 }
                 geng::MouseButton::Right => {
                     self.geng.window().lock_cursor();
@@ -35,13 +35,13 @@ impl Game {
             }
             geng::Event::Wheel { delta } => {
                 let sensitivity = 0.01;
-                self.render.camera.distance =
-                    (self.render.camera.distance - delta as f32 * sensitivity).clamp(1.0, 7.5);
+                self.camera_distance = Coord::new(
+                    (self.camera_distance.as_f32() - delta as f32 * sensitivity).clamp(1.0, 7.5),
+                );
             }
             geng::Event::KeyDown { key } => match key {
                 geng::Key::R if self.geng.window().is_key_pressed(geng::Key::LCtrl) => {
-                    self.player = Player::new();
-                    self.time = Time::ZERO;
+                    self.reset();
                 }
                 geng::Key::T => {
                     if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
@@ -123,5 +123,10 @@ impl Game {
             ray,
         );
         cast.map(|cast| (ray.from + ray.dir * cast).map(Coord::new))
+    }
+
+    pub fn reset(&mut self) {
+        self.player = Player::new();
+        self.run_time = Time::ZERO;
     }
 }
