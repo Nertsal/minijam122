@@ -17,6 +17,7 @@ pub struct Assets {
 #[derive(geng::Assets)]
 pub struct SfxAssets {
     pub hit: geng::Sound,
+    pub fall: geng::Sound,
 }
 
 #[derive(geng::Assets)]

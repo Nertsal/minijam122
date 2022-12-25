@@ -113,6 +113,7 @@ impl Game {
     }
 
     pub fn player_death(&mut self) {
+        self.assets.sfx.fall.play();
         self.player.position = self.player.last_shot;
         self.player.velocity = Vec3::ZERO;
         self.player.fatigue = R32::ZERO;
