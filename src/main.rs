@@ -62,7 +62,14 @@ fn main() {
             <Assets as geng::LoadAsset>::load(&geng, &static_path()),
             {
                 let geng = geng.clone();
-                move |assets| Menu::new(&geng, &Rc::new(assets.unwrap()))
+                move |assets| {
+                    let assets = assets.unwrap();
+                    let mut music = assets.sfx.music.effect();
+                    music.set_volume(0.5);
+                    music.play();
+                    // TODO: music.set_volume when change setting
+                    Menu::new(&geng, &Rc::new(assets))
+                }
             },
         ),
     );

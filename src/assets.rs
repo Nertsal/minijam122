@@ -20,6 +20,13 @@ pub struct SfxAssets {
     pub fall: geng::Sound,
     #[asset(range = "0..4", path = "bump*.wav")]
     pub bump: Vec<geng::Sound>,
+    pub win: geng::Sound,
+    #[asset(postprocess = "music")]
+    pub music: geng::Sound,
+}
+
+fn music(sound: &mut geng::Sound) {
+    sound.looped = true;
 }
 
 #[derive(geng::Assets)]

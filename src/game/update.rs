@@ -19,6 +19,7 @@ impl Game {
         if !self.player.finished {
             let finish = vec3(3.911, -4.034, 0.076).map(Coord::new); // Hardcode
             if (self.player.position - finish).len() < self.player.radius {
+                self.assets.sfx.win.play();
                 self.player.finished = true;
             }
         }
