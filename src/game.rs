@@ -23,6 +23,7 @@ pub struct Game {
     run_time: Time,
     show_timer: bool,
     volume: f64,
+    eyes_fatigue: Coord,
 }
 
 pub enum Control {
@@ -63,6 +64,7 @@ impl Game {
             run_time: Time::ZERO,
             show_timer: false,
             volume,
+            eyes_fatigue: r32(0.0),
         }
     }
 }

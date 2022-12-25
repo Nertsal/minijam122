@@ -8,17 +8,13 @@ impl Game {
 
         {
             // Blinking animation
-            let min = (self.player.fatigue.as_f32() / 2.0).powf(1.0);
-            let max = (self.player.fatigue.as_f32() / 2.0).powf(1.0 / 2.0);
-            let closed = (min + (1.0 - self.time.as_f32().cos() * 0.5 - 0.5) * (max - min))
-                * self.player.fatigue.as_f32();
             ugli::draw(
                 framebuffer,
                 &self.assets.shaders.blink,
                 ugli::DrawMode::TriangleFan,
                 &self.render.quad_geometry,
                 ugli::uniforms! {
-                    u_closed: closed,
+                    u_closed: self.eyes_fatigue.as_f32(),
                 },
                 ugli::DrawParameters {
                     blend_mode: Some(ugli::BlendMode::default()),

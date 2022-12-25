@@ -9,6 +9,15 @@ impl Game {
             self.run_time += delta_time;
         }
 
+        {
+            // Update eyes
+            let min = (self.player.fatigue.as_f32() / 2.0).powf(1.0);
+            let max = (self.player.fatigue.as_f32() / 2.0).powf(1.0 / 2.0);
+            let target = (min + (1.0 - self.time.as_f32().cos() * 0.5 - 0.5) * (max - min))
+                * self.player.fatigue.as_f32();
+            self.eyes_fatigue += (r32(target) - self.eyes_fatigue) * r32(2.0) * delta_time;
+        }
+
         // Movement
         self.player.velocity += GRAVITY.map(Coord::new) * delta_time;
         self.player.position += self.player.velocity * delta_time;
