@@ -8,8 +8,9 @@ impl Game {
 
         {
             // Blinking animation
-            let closed =
-                (1.0 - self.time.as_f32().cos() * 0.5 + 0.5) * self.player.fatigue.as_f32();
+            let min = (self.player.fatigue.as_f32() / 2.0).sqrt();
+            let closed = (min + (1.0 - self.time.as_f32().cos() * 0.5 - 0.5) * (1.0 - min))
+                * self.player.fatigue.as_f32();
             ugli::draw(
                 framebuffer,
                 &self.assets.shaders.blink,

@@ -55,6 +55,9 @@ impl Game {
                 geng::Key::F2 => {
                     self.show_timer = !self.show_timer;
                 }
+                geng::Key::F => {
+                    self.player.fatigue += r32(0.1);
+                }
                 _ => {}
             },
             _ => {}
