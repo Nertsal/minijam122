@@ -99,6 +99,9 @@ impl Game {
             Control::Hitting { time, hit } => {
                 *time += delta_time / Time::new(0.3);
                 if *time >= Time::ONE {
+                    let mut sfx = self.assets.sfx.hit.effect();
+                    sfx.set_volume(hit.len().as_f32() as f64 / 14.0);
+                    sfx.play();
                     self.player.velocity += *hit;
                     self.player.last_shot = self.player.position;
                     self.player.fatigue = (self.player.fatigue + r32(0.2)).min(R32::ONE);

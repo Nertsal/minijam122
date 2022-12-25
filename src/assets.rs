@@ -11,6 +11,12 @@ pub struct Assets {
     #[asset(load_with = "gltf_load::load_meshes(&geng, base_path.join(\"club.glb\"))")]
     pub club: Vec<Mesh>,
     pub shaders: Shaders,
+    pub sfx: SfxAssets,
+}
+
+#[derive(geng::Assets)]
+pub struct SfxAssets {
+    pub hit: geng::Sound,
 }
 
 #[derive(geng::Assets)]
