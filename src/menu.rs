@@ -7,6 +7,7 @@ pub struct Menu {
     framebuffer_size: Vec2<usize>,
     transition: Option<geng::Transition>,
     time: f32,
+    volume: f64,
 }
 
 impl Menu {
@@ -18,6 +19,7 @@ impl Menu {
             framebuffer_size: vec2(1, 1),
             transition: None,
             time: 0.0,
+            volume: 0.5,
         }
     }
 }
@@ -52,16 +54,37 @@ impl geng::State for Menu {
                 &self.geng,
                 &self.assets,
                 self.render.camera.clone(),
+                self.volume,
             ))));
+        }
+
+        let volume_slider = crate::ui::Slider::new(cx, self.volume, 0.0..=1.0);
+        if let Some(value) = volume_slider.get_change() {
+            self.volume = value.clamp(0.0, 1.0);
+            self.geng.audio().set_volume(self.volume);
         }
 
         // Box::new(geng::ui::column![play].padding(0.5, 0.1, 0.05, 0.1))
         let fb = self.framebuffer_size.map(|x| x as f64);
-        Box::new(play.fixed_size(fb * 0.2).align(vec2(0.5, 1.0)).padding(
-            fb.y * 0.8,
-            fb.x * 0.1,
-            fb.y * 0.05,
-            fb.x * 0.1,
-        ))
+        Box::new(geng::ui::stack![
+            geng::ui::column![
+                crate::ui::Text::new(
+                    "volume",
+                    self.geng.default_font(),
+                    fb.y as f32 * 0.05,
+                    Rgba::BLACK
+                ),
+                volume_slider,
+            ]
+            .fixed_size(fb * 0.1)
+            .align(vec2(1.0, 0.0))
+            .padding(0.0, fb.x * 0.05, fb.y * 0.05, 0.0),
+            play.fixed_size(fb * 0.2).align(vec2(0.5, 1.0)).padding(
+                fb.y * 0.8,
+                fb.x * 0.1,
+                fb.y * 0.05,
+                fb.x * 0.1,
+            )
+        ])
     }
 }

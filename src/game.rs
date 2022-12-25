@@ -22,6 +22,7 @@ pub struct Game {
     time: Time,
     run_time: Time,
     show_timer: bool,
+    volume: f64,
 }
 
 pub enum Control {
@@ -43,7 +44,7 @@ pub enum Control {
 }
 
 impl Game {
-    pub fn new(geng: &Geng, assets: &Rc<Assets>, initial_camera: Camera) -> Self {
+    pub fn new(geng: &Geng, assets: &Rc<Assets>, initial_camera: Camera, volume: f64) -> Self {
         Self {
             render: {
                 let mut render = Render::new(geng, assets);
@@ -61,6 +62,7 @@ impl Game {
             time: Time::ZERO,
             run_time: Time::ZERO,
             show_timer: false,
+            volume,
         }
     }
 }
