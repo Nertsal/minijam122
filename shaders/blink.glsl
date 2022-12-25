@@ -7,7 +7,8 @@ attribute vec2 a_pos;
 
 void main() {
     vec2 pos = a_pos * 2.0 - 1.0;
-    v_quad_pos = vec2(pos.x * 0.8, pos.y * u_closed) * 0.8;
+    float t = 1.0 - (u_closed - 1.0) * (u_closed - 1.0);
+    v_quad_pos = vec2(pos.x * 0.8, pos.y * t * 2.0);
     gl_Position = vec4(pos, 0.0, 1.0);
 }
 #endif
