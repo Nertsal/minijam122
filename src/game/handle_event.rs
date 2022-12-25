@@ -10,10 +10,10 @@ impl Game {
                     }
                 }
                 geng::MouseButton::Middle => {
-                    if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
-                        self.player.position = pos + Vec2::ZERO.extend(self.player.radius);
-                        self.player.velocity = Vec3::ZERO;
-                    }
+                    // if let Some(pos) = self.raycast_to_mouse(self.geng.window().mouse_pos()) {
+                    //     self.player.position = pos + Vec2::ZERO.extend(self.player.radius);
+                    //     self.player.velocity = Vec3::ZERO;
+                    // }
                 }
                 geng::MouseButton::Right => {
                     self.geng.window().lock_cursor();
