@@ -27,4 +27,5 @@ pub struct Shaders {
     pub gltf: ugli::Program,
     pub gltf_outline: ugli::Program,
     pub postprocess: ugli::Program,
+    pub blink: ugli::Program,
 }

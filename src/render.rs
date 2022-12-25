@@ -5,7 +5,7 @@ pub struct Render {
     assets: Rc<Assets>,
     pub camera: Camera,
     framebuffer_size: Vec2<usize>,
-    quad_geometry: ugli::VertexBuffer<draw_2d::Vertex>,
+    pub quad_geometry: ugli::VertexBuffer<draw_2d::Vertex>,
     outline_texture: RefCell<ugli::Texture>,
     color_texture: RefCell<ugli::Texture>,
     depth_buffer: RefCell<ugli::Renderbuffer<ugli::DepthComponent>>,

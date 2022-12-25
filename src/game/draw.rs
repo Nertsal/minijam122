@@ -6,6 +6,25 @@ impl Game {
         self.render
             .draw_world(&self.player, &self.control, framebuffer);
 
+        {
+            // Blinking animation
+            let closed =
+                (1.0 - self.time.as_f32().cos() * 0.5 + 0.5) * self.player.fatigue.as_f32();
+            ugli::draw(
+                framebuffer,
+                &self.assets.shaders.blink,
+                ugli::DrawMode::TriangleFan,
+                &self.render.quad_geometry,
+                ugli::uniforms! {
+                    u_closed: closed,
+                },
+                ugli::DrawParameters {
+                    blend_mode: Some(ugli::BlendMode::default()),
+                    ..default()
+                },
+            );
+        }
+
         // UI
         let camera = geng::Camera2d {
             center: Vec2::ZERO,
