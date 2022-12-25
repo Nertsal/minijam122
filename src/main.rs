@@ -8,6 +8,7 @@ mod loading_screen;
 mod menu;
 mod model;
 mod render;
+mod ui;
 mod util;
 
 use assets::*;

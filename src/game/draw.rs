@@ -19,35 +19,10 @@ impl Game {
                 camera.fov,
             ) / 2.0,
         );
+        // let camera_pos =
+        //     |relative: Vec2<_>| camera_aabb.bottom_left() + camera_aabb.size() * relative;
 
-        if self.player.finished {
-            self.geng.default_font().draw_with_outline(
-                framebuffer,
-                &camera,
-                "YOU FINISHED!",
-                camera_aabb.center() + vec2(0.0, 2.0),
-                geng::TextAlign::CENTER,
-                1.0,
-                Rgba::BLACK,
-                0.02,
-                Rgba::WHITE,
-            );
-            let (mins, secs, mils) = time(self.time.as_f32());
-            self.geng.default_font().draw_with_outline(
-                framebuffer,
-                &camera,
-                &format!(
-                    "hits: {}\ndeaths: {}\n{:02}:{:02}.{:03.0}",
-                    self.player.hits, self.player.deaths, mins, secs, mils
-                ),
-                camera_aabb.center() + vec2(0.0, -2.0),
-                geng::TextAlign::CENTER,
-                1.0,
-                Rgba::BLACK,
-                0.02,
-                Rgba::WHITE,
-            );
-        } else {
+        if !self.player.finished {
             self.geng.default_font().draw_with_outline(
                 framebuffer,
                 &camera,
@@ -62,7 +37,7 @@ impl Game {
             self.geng.default_font().draw_with_outline(
                 framebuffer,
                 &camera,
-                &format!("Deaths: {}", self.player.deaths),
+                &format!("Losses: {}", self.player.deaths),
                 camera_aabb.top_left() + vec2(0.2, -1.0),
                 geng::TextAlign::LEFT,
                 0.5,
@@ -84,7 +59,7 @@ impl Game {
         }
 
         if self.show_timer {
-            let (mins, secs, mils) = time(self.time.as_f32());
+            let (mins, secs, mils) = time(self.run_time.as_f32());
             self.geng.default_font().draw_with_outline(
                 framebuffer,
                 &camera,
@@ -100,7 +75,7 @@ impl Game {
     }
 }
 
-fn time(secs: f32) -> (u32, u32, f32) {
+pub fn time(secs: f32) -> (u32, u32, f32) {
     let mut time = secs;
     let mut mins = 0;
     while time > 60.0 {

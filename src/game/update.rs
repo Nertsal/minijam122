@@ -4,8 +4,9 @@ const GRAVITY: Vec3<f32> = vec3(0.0, 0.0, -9.8);
 
 impl Game {
     pub fn update(&mut self, delta_time: Time) {
+        self.time += delta_time;
         if !self.player.finished {
-            self.time += delta_time;
+            self.run_time += delta_time;
         }
 
         // Movement
@@ -69,7 +70,28 @@ impl Game {
 
         // Camera interpolation
         let interpolation = 1.0 / 0.5;
-        let target_pos = self.player.position.map(Coord::as_f32) + vec3(0.0, 0.0, 1.0);
+        let interpolate = |value: &mut f32, target| {
+            *value += (target - *value) * interpolation * delta_time.as_f32();
+        };
+        let target_pos = if self.player.finished {
+            let t = self.time.as_f32() * 0.1;
+
+            let angle = t.sin() * 0.6;
+            interpolate(&mut self.render.camera.rot_h, angle);
+            interpolate(&mut self.render.camera.rot_v, f32::PI / 6.0);
+            interpolate(&mut self.render.camera.distance, 60.0);
+            interpolate(&mut self.render.camera.fov, f32::PI / 5.0);
+
+            vec3(17.0, -5.0, 1.0) + vec2(15.0, -5.0).rotate(angle).extend(0.0)
+        } else {
+            interpolate(
+                &mut self.render.camera.distance,
+                self.camera_distance.as_f32(),
+            );
+            interpolate(&mut self.render.camera.fov, f32::PI / 3.0);
+
+            self.player.position.map(Coord::as_f32) + vec3(0.0, 0.0, 1.0)
+        };
         let pos = self.render.camera.pos;
         self.render.camera.pos += (target_pos - pos) * interpolation * delta_time.as_f32();
 
