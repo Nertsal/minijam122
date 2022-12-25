@@ -18,6 +18,8 @@ pub struct Assets {
 pub struct SfxAssets {
     pub hit: geng::Sound,
     pub fall: geng::Sound,
+    #[asset(range = "0..4", path = "bump*.wav")]
+    pub bump: Vec<geng::Sound>,
 }
 
 #[derive(geng::Assets)]

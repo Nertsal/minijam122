@@ -52,7 +52,22 @@ impl Game {
             };
             if len < player.radius {
                 let n = v.normalize_or_zero();
-                player.velocity -= n * Vec3::dot(n, player.velocity) * Coord::new(1.0 + bounciness);
+                let impulse = -Vec3::dot(n, player.velocity) * Coord::new(1.0 + bounciness);
+                {
+                    let volume = (impulse.as_f32() as f64 / 20.0).clamp(0.0, 1.0);
+                    if volume > 0.1 {
+                        let mut sfx = self
+                            .assets
+                            .sfx
+                            .bump
+                            .choose(&mut global_rng())
+                            .unwrap()
+                            .effect();
+                        sfx.set_volume(volume);
+                        sfx.play();
+                    }
+                }
+                player.velocity += n * impulse;
                 player.position += n * (player.radius - len);
 
                 drag = if n.xy() != Vec2::ZERO {
